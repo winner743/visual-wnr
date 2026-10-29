@@ -1,2 +1,3 @@
-# visual-wnr
-Website deployed via GitHub Pages
+# Visual WNR
+
+Hosted on GitHub Pages.
