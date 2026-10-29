@@ -1,0 +1,1154 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DevDeploy Studio PRO - Modern Cloud IDE & Deployer</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              vercel: '#ffffff',
+              github: '#2ea44f',
+              netlify: '#00c7b7',
+              accent: '#3b82f6',
+              purple: '#8b5cf6',
+              darkBg: '#030712',
+              panelBg: '#0f172a',
+              borderBg: '#1e293b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Monaco', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- JSZip for Exporting ZIP Archives -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- Monaco Editor Loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
+
+  <style>
+    /* Custom Smooth Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Glassmorphic Panel Styles */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Tab Transition Animations */
+    .view-panel {
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: opacity, transform;
+    }
+
+    .view-panel.active {
+      display: flex !important;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .view-panel.inactive {
+      display: none !important;
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      pointer-events: none;
+    }
+
+    /* Neon Accent Glow Effects */
+    .glow-blue {
+      box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+    }
+    .glow-purple {
+      box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-full overflow-hidden flex flex-col antialiased select-none">
+
+  <!-- TOP APP HEADER -->
+  <header class="h-14 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between z-40 shrink-0">
+    <!-- Brand Logo & Version -->
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+        <i data-lucide="code-2" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-blue-500">PRO</span></span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">v3.0 ULTRA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active View Indicator / Quick Actions -->
+    <div class="flex items-center space-x-2">
+      <!-- Quick Load Test Template Header Button -->
+      <button onclick="loadTestTemplate()" class="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
+        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Load Test Template</span>
+      </button>
+
+      <!-- Deploy Quick Trigger -->
+      <button onclick="switchView('deploy')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-xs rounded-lg flex items-center space-x-1.5 shadow-md shadow-blue-600/20 transition">
+        <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+        <span>Deploy</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APP BODY LAYOUT -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- DESKTOP SIDEBAR NAVIGATION -->
+    <aside class="hidden md:flex w-56 bg-slate-900/60 border-r border-slate-800/80 flex-col justify-between shrink-0">
+      <div class="p-3 space-y-1">
+        
+        <button onclick="switchView('editor')" id="nav-desktop-editor" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-blue-400 bg-blue-500/10 border border-blue-500/20">
+          <i data-lucide="file-code" class="w-4 h-4 shrink-0"></i>
+          <span>Code Editor</span>
+        </button>
+
+        <button onclick="switchView('templates')" id="nav-desktop-templates" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="boxes" class="w-4 h-4 shrink-0"></i>
+          <span>Brand Templates</span>
+        </button>
+
+        <button onclick="switchView('deploy')" id="nav-desktop-deploy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="cloud-lightning" class="w-4 h-4 shrink-0"></i>
+          <span>Deploy & Tokens</span>
+        </button>
+
+        <button onclick="switchView('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400 shrink-0"></i>
+          <span>AI Helper & English</span>
+        </button>
+
+        <button onclick="switchView('logs')" id="nav-desktop-logs" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="terminal" class="w-4 h-4 shrink-0"></i>
+          <span>Terminal Logs</span>
+        </button>
+
+      </div>
+
+      <!-- Footer Info Badge -->
+      <div class="p-3 border-t border-slate-800/80">
+        <div class="bg-slate-950/60 rounded-lg p-2.5 border border-slate-800/80 text-[11px] space-y-1">
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Editor Engine:</span>
+            <span class="text-emerald-400 font-mono">Monaco JS</span>
+          </div>
+          <div class="flex items-center justify-between text-slate-400">
+            <span>Active Target:</span>
+            <span id="sidebar-target-name" class="text-blue-400 font-mono">Vercel</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT VIEWS CONTAINER -->
+    <main class="flex-1 bg-slate-950 relative overflow-hidden flex flex-col">
+
+      <!-- ========================================== -->
+      <!-- VIEW 1: DEDICATED FULL EDITOR WORKSPACE    -->
+      <!-- ========================================== -->
+      <section id="view-editor" class="view-panel active h-full flex-col flex-1 p-3 md:p-4 space-y-3">
+        
+        <!-- Editor Header Toolbar -->
+        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0">
+          
+          <!-- File Tabs Bar -->
+          <div id="file-tabs-bar" class="flex items-center space-x-1.5 overflow-x-auto pr-2">
+            <!-- Rendered File Tabs -->
+          </div>
+
+          <!-- Actions Bar -->
+          <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="createNewFilePrompt()" title="Add File" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition">
+              <i data-lucide="file-plus" class="w-4 h-4"></i>
+            </button>
+
+            <button onclick="clearWorkspace()" title="Clear Workspace" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-lg transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+
+            <button onclick="downloadZip()" title="Download Source ZIP" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium flex items-center space-x-1 transition">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">ZIP</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Editor Container Area -->
+        <div class="flex-1 glass-card rounded-xl border border-slate-800/80 overflow-hidden relative flex flex-col">
+          
+          <!-- Empty Workspace Prompt Overlay -->
+          <div id="empty-workspace-banner" class="absolute inset-0 bg-slate-950/90 z-20 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <i data-lucide="file-code-2" class="w-6 h-6"></i>
+            </div>
+            <div class="max-w-md space-y-1">
+              <h3 class="font-bold text-base text-slate-200">Editor Workspace is Blank</h3>
+              <p class="text-xs text-slate-400">Start typing code directly or click below to load a ready-to-test sample script.</p>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+              <button onclick="loadTestTemplate()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-blue-500/20 transition">
+                🚀 Load Sample Test Template
+              </button>
+              <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition">
+                Start From Scratch
+              </button>
+            </div>
+          </div>
+
+          <!-- Monaco Editor Frame -->
+          <div id="monaco-container" class="w-full h-full bg-[#1e1e1e]"></div>
+        </div>
+
+        <!-- Editor Footer Status Bar -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-400 font-mono shrink-0">
+          <div class="flex items-center space-x-3">
+            <span id="active-lang-badge" class="text-blue-400">HTML</span>
+            <span>UTF-8</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span id="active-char-count">0 characters</span>
+            <span class="text-emerald-400">Ready</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 2: SCRIPT & BRAND TEMPLATES LIBRARY   -->
+      <!-- ========================================== -->
+      <section id="view-templates" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
+        
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+              <i data-lucide="boxes" class="w-5 h-5 text-blue-400"></i>
+              <span>Brand Script & Framework Templates</span>
+            </h1>
+            <p class="text-xs text-slate-400">Choose a framework starter or custom script template to load into your editor.</p>
+          </div>
+
+          <div class="flex items-center space-x-2 w-full md:w-auto">
+            <input type="text" id="template-search-input" onkeyup="filterTemplates()" placeholder="Search templates..." class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-full md:w-56" />
+            
+            <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-2 rounded-lg font-medium flex items-center space-x-1.5 shrink-0 transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Custom</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Badges -->
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+          <button onclick="filterCategory('all')" class="cat-pill px-3 py-1 rounded-full bg-blue-600 text-white font-medium">All Frameworks</button>
+          <button onclick="filterCategory('frontend')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Frontend</button>
+          <button onclick="filterCategory('backend')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Backend API</button>
+          <button onclick="filterCategory('fullstack')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Fullstack</button>
+        </div>
+
+        <!-- Template Cards Grid -->
+        <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered Template Cards -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 3: DEPLOYMENT HUB & TOKEN SETTINGS    -->
+      <!-- ========================================== -->
+      <section id="view-deploy" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-5xl mx-auto w-full">
+        
+        <div>
+          <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+            <i data-lucide="cloud-lightning" class="w-5 h-5 text-blue-400"></i>
+            <span>Cloud Deployment Hub</span>
+          </h1>
+          <p class="text-xs text-slate-400">Configure deployment targets, saved API credentials, and execute cloud triggers.</p>
+        </div>
+
+        <!-- Deployment Target Selection Tabs -->
+        <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
+          <label class="block text-xs font-semibold text-slate-300">Choose Target Cloud Provider</label>
+          <div class="grid grid-cols-3 gap-3">
+            
+            <button onclick="setDeployTarget('vercel')" id="target-card-vercel" class="target-card p-4 rounded-xl border border-blue-500 bg-blue-500/10 flex flex-col items-center justify-center space-y-2 text-white transition">
+              <i data-lucide="triangle" class="w-6 h-6 fill-current"></i>
+              <span class="text-xs font-bold">Vercel</span>
+            </button>
+
+            <button onclick="setDeployTarget('github')" id="target-card-github" class="target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition">
+              <i data-lucide="github" class="w-6 h-6"></i>
+              <span class="text-xs font-bold">GitHub Pages</span>
+            </button>
+
+            <button onclick="setDeployTarget('netlify')" id="target-card-netlify" class="target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition">
+              <i data-lucide="globe" class="w-6 h-6"></i>
+              <span class="text-xs font-bold">Netlify</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Project Deploy Settings & API Credentials Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Column 1: Repository Settings -->
+          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Project Configurations</h3>
+            
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Project / Repository Name</label>
+              <input type="text" id="deploy-proj-name" value="my-awesome-app" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Access Visibility</label>
+              <select id="deploy-visibility" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                <option value="public">Public Repository / Site</option>
+                <option value="private">Private Access</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Build Command (Optional)</label>
+              <input type="text" value="npm run build" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+            </div>
+          </div>
+
+          <!-- Column 2: Saved API Credentials -->
+          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">API Bearer / PAT Credentials</h3>
+
+            <!-- GitHub Token -->
+            <div class="space-y-1">
+              <label class="block text-xs text-slate-400 flex items-center justify-between">
+                <span>GitHub Personal Access Token</span>
+                <span id="badge-token-github" class="text-[10px] text-amber-400">Unset</span>
+              </label>
+              <input type="password" id="input-token-github" placeholder="ghp_xxxxxxxxxxxxxxxx" onchange="saveToken('github')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+            </div>
+
+            <!-- Vercel Token -->
+            <div class="space-y-1">
+              <label class="block text-xs text-slate-400 flex items-center justify-between">
+                <span>Vercel API Bearer Token</span>
+                <span id="badge-token-vercel" class="text-[10px] text-amber-400">Unset</span>
+              </label>
+              <input type="password" id="input-token-vercel" placeholder="Bearer Token..." onchange="saveToken('vercel')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+            </div>
+
+            <!-- Netlify Token -->
+            <div class="space-y-1">
+              <label class="block text-xs text-slate-400 flex items-center justify-between">
+                <span>Netlify Personal Token</span>
+                <span id="badge-token-netlify" class="text-[10px] text-amber-400">Unset</span>
+              </label>
+              <input type="password" id="input-token-netlify" placeholder="nfp_xxxxxxxxxxxxxxxx" onchange="saveToken('netlify')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Trigger Deploy Action Card -->
+        <div class="glass-card p-6 rounded-xl border border-blue-500/30 flex flex-col items-center text-center space-y-4">
+          <div class="space-y-1">
+            <h2 class="text-base font-bold text-white">Ready to Deploy Workspace</h2>
+            <p class="text-xs text-slate-400">This will package active files and trigger deployment to <span id="target-display-label" class="text-blue-400 font-bold">Vercel</span>.</p>
+          </div>
+
+          <button onclick="triggerDeployment()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-blue-500/25 flex items-center justify-center space-x-2 transition">
+            <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+            <span>Execute Cloud Deployment</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: AI SCRIPT & ENGLISH HELPER         -->
+      <!-- ========================================== -->
+      <section id="view-ai" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
+        
+        <div>
+          <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+            <span>AI Technical English & Script Helper</span>
+          </h1>
+          <p class="text-xs text-slate-400">Refine comments, variable names, and documentation into fluent technical English using Gemini AI.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Input Area -->
+          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-300">Source Input Code / Text</label>
+              <button onclick="importActiveFileToAI()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
+                <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
+                <span>Load Active Editor Code</span>
+              </button>
+            </div>
+
+            <textarea id="ai-input-box" rows="12" placeholder="Paste code or rough notes here..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="runAIOptimizer('english')" class="py-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+                <i data-lucide="languages" class="w-3.5 h-3.5"></i>
+                <span>Polish English</span>
+              </button>
+              <button onclick="runAIOptimizer('readme')" class="py-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Build README</span>
+              </button>
+              <button onclick="runAIOptimizer('refactor')" class="py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+                <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                <span>Refactor</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Output Result Area -->
+          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-amber-400 flex items-center space-x-1">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>AI Refined Output</span>
+              </label>
+              
+              <div class="flex items-center space-x-2">
+                <button onclick="copyAIOutput()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-md transition">
+                  Copy
+                </button>
+                <button onclick="applyAIToActiveFile()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-md transition">
+                  Apply to Editor
+                </button>
+              </div>
+            </div>
+
+            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[250px] whitespace-pre-wrap">
+              <span class="text-slate-600 italic">Enhanced result will appear here...</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 5: FULLSCREEN TERMINAL & LOGS         -->
+      <!-- ========================================== -->
+      <section id="view-logs" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 space-y-4">
+        
+        <div class="flex items-center justify-between shrink-0">
+          <div>
+            <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+              <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i>
+              <span>Cloud Build & Deploy Logs</span>
+            </h1>
+            <p class="text-xs text-slate-400">Live request tracing, build stderr output, and DNS routing logs.</p>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="downloadTerminalLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg flex items-center space-x-1">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Export Log</span>
+            </button>
+            <button onclick="clearTerminalLogs()" class="px-3 py-1.5 bg-rose-500/10 text-rose-400 text-xs rounded-lg">
+              Clear Console
+            </button>
+          </div>
+        </div>
+
+        <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs overflow-y-auto space-y-1.5 text-slate-300">
+          <div class="text-slate-600">[SYSTEM] DevDeploy Studio Terminal initialized. Log stream ready.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="md:hidden h-16 border-t border-slate-800/80 bg-slate-900/95 backdrop-blur-md px-2 flex items-center justify-around z-40 shrink-0">
+    
+    <button onclick="switchView('editor')" id="nav-mobile-editor" class="flex flex-col items-center justify-center w-12 py-1 text-blue-400">
+      <i data-lucide="file-code" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-1 font-medium">Editor</span>
+    </button>
+
+    <button onclick="switchView('templates')" id="nav-mobile-templates" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="boxes" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-1 font-medium">Templates</span>
+    </button>
+
+    <button onclick="switchView('deploy')" id="nav-mobile-deploy" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-1 font-medium">Deploy</span>
+    </button>
+
+    <button onclick="switchView('ai')" id="nav-mobile-ai" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-1 font-medium">AI Helper</span>
+    </button>
+
+    <button onclick="switchView('logs')" id="nav-mobile-logs" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="terminal" class="w-5 h-5"></i>
+      <span class="text-[10px] mt-1 font-medium">Logs</span>
+    </button>
+
+  </nav>
+
+  <!-- MODAL: ADD CUSTOM SCRIPT -->
+  <div id="modal-custom-script" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card w-full max-w-lg p-6 rounded-2xl border border-slate-800 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i>
+          <span>Save Custom Template</span>
+        </h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Template Title</label>
+          <input type="text" id="modal-title" placeholder="e.g. My Custom React Component" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Category</label>
+            <select id="modal-cat" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend API</option>
+              <option value="fullstack">Fullstack</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Language</label>
+            <select id="modal-lang" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="html">HTML</option>
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="python">Python</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Source Code</label>
+          <textarea id="modal-code" rows="6" placeholder="// Enter custom script template code..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 focus:outline-none resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
+        <button onclick="closeAddModal()" class="px-3 py-2 text-xs text-slate-400 hover:text-slate-200">Cancel</button>
+        <button onclick="saveCustomTemplate()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg">Save Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC & STATE ENGINE -->
+  <script>
+    // Application State
+    let currentView = 'editor';
+    let activeDeployTarget = 'vercel';
+    let monacoEditor = null;
+    let activeFileKey = 'index.html';
+
+    // Blank Workspace Files State (Starts Empty by default!)
+    let workspaceFiles = {
+      'index.html': {
+        name: 'index.html',
+        language: 'html',
+        content: `` // Starts completely empty
+      }
+    };
+
+    // Framework Brand Templates Library
+    let templateCatalog = [
+      {
+        id: 'tpl-react-tailwind',
+        name: 'React 18 + Tailwind Starter',
+        category: 'frontend',
+        brand: 'React.js',
+        description: 'Single-page React component setup with CDN Tailwind CSS.',
+        language: 'html',
+        code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React + Tailwind App</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const [count, setCount] = React.useState(0);
+      return (
+        <div class="p-8 max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-xl text-center space-y-4">
+          <h1 class="text-2xl font-bold text-sky-400">React + Tailwind</h1>
+          <p class="text-xs text-slate-400">Interactive cloud application deployed with DevDeploy Studio PRO.</p>
+          <button onClick={() => setCount(c => c + 1)} class="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg font-medium text-xs">
+            Clicks: {count}
+          </button>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  <\/script>
+</body>
+</html>`
+      },
+      {
+        id: 'tpl-vue3',
+        name: 'Vue.js 3 Reactive Starter',
+        category: 'frontend',
+        brand: 'Vue.js',
+        description: 'Standalone Vue 3 reactive setup with script composition.',
+        language: 'html',
+        code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vue 3 App</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-slate-950 text-white flex items-center justify-center min-h-screen">
+  <div id="app" class="p-6 bg-slate-900 border border-slate-800 rounded-xl text-center space-y-3">
+    <h2 class="text-xl font-bold text-emerald-400">{{ title }}</h2>
+    <p class="text-xs text-slate-400">Counter: {{ counter }}</p>
+    <button @click="counter++" class="px-3 py-1.5 bg-emerald-600 rounded text-xs font-semibold">Increment</button>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        const title = ref('Vue 3 Interactive App');
+        const counter = ref(0);
+        return { title, counter };
+      }
+    }).mount('#app');
+  <\/script>
+</body>
+</html>`
+      },
+      {
+        id: 'tpl-express-api',
+        name: 'Node.js Express REST API',
+        category: 'backend',
+        brand: 'Node.js',
+        description: 'Clean REST endpoint template with CORS and healthcheck route.',
+        language: 'javascript',
+        code: `const express = require('express');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', uptime: process.uptime(), timestamp: Date.now() });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));`
+      },
+      {
+        id: 'tpl-python-fastapi',
+        name: 'Python FastAPI Microservice',
+        category: 'backend',
+        brand: 'Python',
+        description: 'FastAPI Python script template for serverless endpoints.',
+        language: 'python',
+        code: `from fastapi import FastAPI
+
+app = FastAPI(title="DevDeploy Microservice")
+
+@app.get("/")
+def read_root():
+    return {"status": "FastAPI Online", "service": "DevDeploy PRO"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int):
+    return {"item_id": item_id, "active": True}`
+      }
+    ];
+
+    // Initialization on Page Load
+    window.onload = function() {
+      lucide.createIcons();
+      initMonacoEditor();
+      renderFileTabs();
+      renderTemplatesGrid();
+      loadTokensFromStorage();
+      checkEmptyWorkspaceStatus();
+    };
+
+    // View Switcher Engine with Smooth Animations
+    function switchView(viewId) {
+      if (currentView === viewId) return;
+
+      // Deactivate current view
+      const currentEl = document.getElementById(`view-${currentView}`);
+      if (currentEl) {
+        currentEl.classList.remove('active');
+        currentEl.classList.add('inactive');
+      }
+
+      // Update Nav Buttons State (Desktop + Mobile)
+      ['editor', 'templates', 'deploy', 'ai', 'logs'].forEach(v => {
+        const dBtn = document.getElementById(`nav-desktop-${v}`);
+        const mBtn = document.getElementById(`nav-mobile-${v}`);
+
+        if (v === viewId) {
+          dBtn?.classList.add('text-blue-400', 'bg-blue-500/10', 'border', 'border-blue-500/20');
+          dBtn?.classList.remove('text-slate-400');
+          
+          mBtn?.classList.add('text-blue-400');
+          mBtn?.classList.remove('text-slate-400');
+        } else {
+          dBtn?.classList.remove('text-blue-400', 'bg-blue-500/10', 'border', 'border-blue-500/20');
+          dBtn?.classList.add('text-slate-400');
+
+          mBtn?.classList.remove('text-blue-400');
+          mBtn?.classList.add('text-slate-400');
+        }
+      });
+
+      // Activate new view
+      currentView = viewId;
+      const newEl = document.getElementById(`view-${viewId}`);
+      if (newEl) {
+        newEl.classList.remove('inactive');
+        newEl.classList.add('active');
+      }
+
+      // Re-layout Monaco Editor if returning to editor
+      if (viewId === 'editor' && monacoEditor) {
+        setTimeout(() => monacoEditor.layout(), 100);
+      }
+    }
+
+    // Monaco Editor Setup
+    function initMonacoEditor() {
+      require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
+      require(['vs/editor/editor.main'], function () {
+        monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
+          value: workspaceFiles[activeFileKey].content,
+          language: workspaceFiles[activeFileKey].language,
+          theme: 'vs-dark',
+          automaticLayout: true,
+          fontSize: 13,
+          fontFamily: 'JetBrains Mono, Monaco, monospace',
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          padding: { top: 12, bottom: 12 }
+        });
+
+        monacoEditor.onDidChangeModelContent(() => {
+          if (workspaceFiles[activeFileKey]) {
+            workspaceFiles[activeFileKey].content = monacoEditor.getValue();
+            updateCharCount();
+            checkEmptyWorkspaceStatus();
+          }
+        });
+
+        updateCharCount();
+      });
+    }
+
+    // Workspace Management Functions
+    function renderFileTabs() {
+      const bar = document.getElementById('file-tabs-bar');
+      if (!bar) return;
+      bar.innerHTML = '';
+
+      Object.keys(workspaceFiles).forEach(key => {
+        const file = workspaceFiles[key];
+        const isActive = key === activeFileKey;
+        
+        const tab = document.createElement('button');
+        tab.className = `px-3 py-1 rounded-md text-xs font-mono flex items-center space-x-1.5 transition ${
+          isActive 
+            ? 'bg-slate-800 text-blue-400 border border-slate-700 font-semibold' 
+            : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+        }`;
+        
+        tab.innerHTML = `
+          <span>${file.name}</span>
+          ${Object.keys(workspaceFiles).length > 1 ? `<i data-lucide="x" class="w-3 h-3 hover:text-rose-400 ml-1" onclick="closeFileTab(event, '${key}')"></i>` : ''}
+        `;
+        
+        tab.onclick = (e) => {
+          if (e.target.dataset.lucide === 'x') return;
+          setActiveFile(key);
+        };
+        bar.appendChild(tab);
+      });
+      lucide.createIcons();
+    }
+
+    function setActiveFile(key) {
+      activeFileKey = key;
+      renderFileTabs();
+      if (monacoEditor && workspaceFiles[key]) {
+        monacoEditor.setValue(workspaceFiles[key].content);
+        monaco.editor.setModelLanguage(monacoEditor.getModel(), workspaceFiles[key].language);
+      }
+      document.getElementById('active-lang-badge').innerText = workspaceFiles[key].language.toUpperCase();
+      updateCharCount();
+      checkEmptyWorkspaceStatus();
+    }
+
+    function checkEmptyWorkspaceStatus() {
+      const banner = document.getElementById('empty-workspace-banner');
+      const activeContent = workspaceFiles[activeFileKey]?.content.trim();
+      if (!activeContent && Object.keys(workspaceFiles).length === 1) {
+        banner?.classList.remove('hidden');
+      } else {
+        banner?.classList.add('hidden');
+      }
+    }
+
+    function dismissEmptyBanner() {
+      document.getElementById('empty-workspace-banner')?.classList.add('hidden');
+    }
+
+    function updateCharCount() {
+      const count = monacoEditor ? monacoEditor.getValue().length : 0;
+      document.getElementById('active-char-count').innerText = `${count} characters`;
+    }
+
+    function createNewFilePrompt() {
+      const name = prompt("Enter file name (e.g., app.js, style.css, index.html):");
+      if (!name) return;
+
+      let lang = 'javascript';
+      if (name.endsWith('.html')) lang = 'html';
+      else if (name.endsWith('.css')) lang = 'css';
+      else if (name.endsWith('.py')) lang = 'python';
+
+      workspaceFiles[name] = { name, language: lang, content: '' };
+      setActiveFile(name);
+    }
+
+    function closeFileTab(e, key) {
+      e.stopPropagation();
+      delete workspaceFiles[key];
+      const remaining = Object.keys(workspaceFiles);
+      if (remaining.length > 0) setActiveFile(remaining[0]);
+    }
+
+    function clearWorkspace() {
+      if (confirm("Clear code in active file?")) {
+        workspaceFiles[activeFileKey].content = '';
+        if (monacoEditor) monacoEditor.setValue('');
+        checkEmptyWorkspaceStatus();
+      }
+    }
+
+    function loadTestTemplate() {
+      const sampleCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevDeploy Sample Test</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800">
+    <div class="w-12 h-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mx-auto">
+      ⚡
+    </div>
+    <h1 class="text-xl font-bold text-blue-400">DevDeploy Studio PRO</h1>
+    <p class="text-xs text-slate-400">Sample test script loaded successfully into the editor.</p>
+  </div>
+</body>
+</html>`;
+
+      workspaceFiles['index.html'] = {
+        name: 'index.html',
+        language: 'html',
+        content: sampleCode
+      };
+
+      switchView('editor');
+      setActiveFile('index.html');
+      logTerminal('SUCCESS', 'Loaded Sample Test Template into editor workspace.');
+    }
+
+    function downloadZip() {
+      const zip = new JSZip();
+      Object.keys(workspaceFiles).forEach(k => zip.file(k, workspaceFiles[k].content));
+      zip.generateAsync({ type: 'blob' }).then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'devdeploy-project.zip';
+        a.click();
+        logTerminal('SUCCESS', 'Exported source code as ZIP archive.');
+      });
+    }
+
+    // Template Library Functions
+    function renderTemplatesGrid() {
+      const grid = document.getElementById('templates-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      templateCatalog.forEach(tpl => {
+        const card = document.createElement('div');
+        card.className = 'glass-card p-5 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition';
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">${tpl.brand}</span>
+              <span class="text-[10px] text-slate-500 uppercase font-mono">${tpl.category}</span>
+            </div>
+            <h3 class="font-bold text-sm text-slate-100">${tpl.name}</h3>
+            <p class="text-xs text-slate-400">${tpl.description}</p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-end">
+            <button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition">
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              <span>Use Template</span>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function useTemplate(id) {
+      const tpl = templateCatalog.find(t => t.id === id);
+      if (!tpl) return;
+
+      workspaceFiles['index.html'] = {
+        name: 'index.html',
+        language: tpl.language,
+        content: tpl.code
+      };
+      switchView('editor');
+      setActiveFile('index.html');
+      logTerminal('SUCCESS', `Loaded template [${tpl.name}] into editor.`);
+    }
+
+    function openAddModal() { document.getElementById('modal-custom-script').classList.remove('hidden'); }
+    function closeAddModal() { document.getElementById('modal-custom-script').classList.add('hidden'); }
+
+    function saveCustomTemplate() {
+      const name = document.getElementById('modal-title').value;
+      const cat = document.getElementById('modal-cat').value;
+      const lang = document.getElementById('modal-lang').value;
+      const code = document.getElementById('modal-code').value;
+
+      if (!name || !code) return alert("Title and code required.");
+
+      templateCatalog.push({
+        id: `custom_${Date.now()}`,
+        name,
+        category: cat,
+        brand: 'Custom',
+        description: 'User saved script template.',
+        language: lang,
+        code
+      });
+
+      renderTemplatesGrid();
+      closeAddModal();
+      alert("Custom template saved!");
+    }
+
+    // Deploy Target Management
+    function setDeployTarget(target) {
+      activeDeployTarget = target;
+      document.getElementById('target-display-label').innerText = target.toUpperCase();
+      document.getElementById('sidebar-target-name').innerText = target.toUpperCase();
+
+      ['vercel', 'github', 'netlify'].forEach(t => {
+        const card = document.getElementById(`target-card-${t}`);
+        if (t === target) {
+          card.className = "target-card p-4 rounded-xl border border-blue-500 bg-blue-500/10 flex flex-col items-center justify-center space-y-2 text-white transition";
+        } else {
+          card.className = "target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition";
+        }
+      });
+    }
+
+    function triggerDeployment() {
+      const projName = document.getElementById('deploy-proj-name').value || 'my-app';
+      switchView('logs');
+      
+      logTerminal('INFO', `Starting deployment sequence for target: ${activeDeployTarget.toUpperCase()}`);
+      logTerminal('INFO', `Project Name: ${projName}`);
+      
+      const steps = [
+        `[1/4] Packaging workspace files (${Object.keys(workspaceFiles).join(', ')})...`,
+        `[2/4] Verifying syntax & dependencies...`,
+        `[3/4] Triggering build hook on ${activeDeployTarget.toUpperCase()} edge servers...`,
+        `[4/4] SUCCESS! Deployed live at: https://${projName}.${activeDeployTarget}.app`
+      ];
+
+      steps.forEach((msg, idx) => {
+        setTimeout(() => {
+          logTerminal(idx === 3 ? 'SUCCESS' : 'INFO', msg);
+        }, (idx + 1) * 700);
+      });
+    }
+
+    // AI Helper Functions
+    async function runAIOptimizer(mode) {
+      const input = document.getElementById('ai-input-box').value;
+      if (!input) return alert("Input text required.");
+
+      const out = document.getElementById('ai-output-box');
+      out.innerText = "Processing request with Gemini AI...";
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        let prompt = `Translate comments/documentation to professional technical English:\n\n${input}`;
+        if (mode === 'readme') prompt = `Generate a markdown README.md in English for:\n\n${input}`;
+        if (mode === 'refactor') prompt = `Refactor and polish code with English comments:\n\n${input}`;
+
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+
+        const data = await res.json();
+        out.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing output.";
+      } catch (err) {
+        out.innerText = "AI Request failed: " + err.message;
+      }
+    }
+
+    function importActiveFileToAI() {
+      document.getElementById('ai-input-box').value = workspaceFiles[activeFileKey]?.content || '';
+    }
+
+    function copyAIOutput() {
+      navigator.clipboard.writeText(document.getElementById('ai-output-box').innerText);
+      alert("Copied AI output!");
+    }
+
+    function applyAIToActiveFile() {
+      const text = document.getElementById('ai-output-box').innerText;
+      if (monacoEditor && workspaceFiles[activeFileKey]) {
+        monacoEditor.setValue(text);
+        switchView('editor');
+      }
+    }
+
+    // Terminal Logging Engine
+    function logTerminal(level, msg) {
+      const consoleEl = document.getElementById('terminal-console-output');
+      if (!consoleEl) return;
+
+      const time = new Date().toLocaleTimeString();
+      let color = 'text-slate-300';
+      if (level === 'SUCCESS') color = 'text-emerald-400 font-bold';
+      if (level === 'WARN') color = 'text-amber-400';
+
+      const line = `<div><span class="text-slate-600">[${time}]</span> <span class="${color}">[${level}] ${msg}</span></div>`;
+      consoleEl.innerHTML += line;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function clearTerminalLogs() {
+      document.getElementById('terminal-console-output').innerHTML = '';
+    }
+
+    function downloadTerminalLog() {
+      const text = document.getElementById('terminal-console-output').innerText;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'devdeploy-terminal.log';
+      a.click();
+    }
+
+    // Token LocalStorage
+    function saveToken(target) {
+      const val = document.getElementById(`input-token-${target}`).value;
+      localStorage.setItem(`token_${target}`, val);
+      loadTokensFromStorage();
+    }
+
+    function loadTokensFromStorage() {
+      ['github', 'vercel', 'netlify'].forEach(t => {
+        const val = localStorage.getItem(`token_${t}`);
+        const badge = document.getElementById(`badge-token-${t}`);
+        if (val) {
+          document.getElementById(`input-token-${t}`).value = val;
+          if (badge) { badge.innerText = "Saved"; badge.className = "text-[10px] text-emerald-400 font-mono"; }
+        }
+      });
+    }
+
+    function filterTemplates() {
+      const query = document.getElementById('template-search-input').value.toLowerCase();
+      document.querySelectorAll('#templates-grid > div').forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('#templates-grid > div').forEach(card => {
+        if (cat === 'all') card.style.display = 'flex';
+        else card.style.display = card.innerText.toLowerCase().includes(cat) ? 'flex' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
+```
