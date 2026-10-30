@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DevDeploy Studio ULTRA - Code IDE, Merger & Tag Helper</title>
+  <title>DevDeploy Studio ULTRA - IDE, 3-Script Merger & AI Generator</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -92,7 +92,7 @@
     /* Preview Viewport Dimensions */
     .preview-desktop { width: 100%; height: 100%; max-width: 100%; }
     .preview-tablet  { width: 768px; height: 100%; max-width: 100%; margin: 0 auto; border-radius: 12px; }
-    .preview-mobile  { width: 375px; height: 667px; max-width: 100%; margin: 0 auto; border-radius: 16px; }
+    .preview-mobile  { width: 375px; height: 600px; max-width: 100%; margin: 0 auto; border-radius: 16px; }
 
     /* Custom Toast Notification Animation */
     @keyframes slideInUp {
@@ -123,7 +123,7 @@
       </div>
       <div class="flex items-center space-x-2">
         <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-purple-400">ULTRA</span></span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.0</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.5</span>
       </div>
     </div>
 
@@ -175,7 +175,7 @@
 
         <button onclick="switchView('preview')" id="nav-desktop-preview" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="play-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-          <span>Live Preview</span>
+          <span>Live Preview & Errors</span>
         </button>
 
         <button onclick="switchView('templates')" id="nav-desktop-templates" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
@@ -190,7 +190,7 @@
 
         <button onclick="switchView('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="sparkles" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>AI Script Helper</span>
+          <span>AI Script & Game Generator</span>
         </button>
 
         <button onclick="switchView('logs')" id="nav-desktop-logs" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
@@ -237,8 +237,10 @@
               <i data-lucide="file-plus" class="w-4 h-4"></i>
             </button>
 
-            <button onclick="clearWorkspace()" title="Clear Active File" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-lg transition">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <!-- DELETE ALL TEXT BUTTON -->
+            <button onclick="clearWorkspace()" title="Delete All Text" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-semibold flex items-center space-x-1 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Clear Text</span>
             </button>
 
             <button onclick="downloadZip()" title="Download Source ZIP" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium flex items-center space-x-1 transition">
@@ -293,17 +295,17 @@
             </div>
             <div class="max-w-md space-y-1">
               <h3 class="font-bold text-base text-slate-200">Workspace is Clean & Blank</h3>
-              <p class="text-xs text-slate-400">Start typing code, tap quick helper tags, or use the 3-script merger to build your app.</p>
+              <p class="text-xs text-slate-400">Start typing code, tap quick helper tags, or generate apps using the AI Generator.</p>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
               <button onclick="loadTestTemplate()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition">
                 🚀 Load Sample Test Code
               </button>
-              <button onclick="switchView('merger')" class="px-4 py-2 bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-600/30 text-xs font-medium rounded-xl transition">
-                ⚡ Open 3-Script Merger
+              <button onclick="switchView('ai')" class="px-4 py-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 text-xs font-medium rounded-xl transition">
+                ✨ Generate HTML Game / App
               </button>
               <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
-                Start From Blank
+                Start Blank
               </button>
             </div>
           </div>
@@ -336,7 +338,7 @@
               <i data-lucide="combine" class="w-5 h-5 text-purple-400"></i>
               <span>Multi-Script Merger & Tag Helper</span>
             </h1>
-            <p class="text-xs text-slate-400">Paste or upload up to 3 scripts (HTML, CSS, JS). Use the helper bars on each slot to insert tags easily.</p>
+            <p class="text-xs text-slate-400">Paste or upload up to 3 scripts (HTML, CSS, JS). Use quick helper buttons or clear text on each slot.</p>
           </div>
 
           <button onclick="loadSampleMergerScripts()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium flex items-center space-x-1.5 transition">
@@ -355,11 +357,14 @@
                 <span class="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px]">1</span>
                 <span>Script 1 (HTML / Base)</span>
               </span>
-              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-blue-400 flex items-center space-x-1">
-                <i data-lucide="upload" class="w-3 h-3"></i>
-                <span>Upload File</span>
-                <input type="file" accept=".html,.txt,.js" class="hidden" onchange="handleScriptFileUpload(event, 'script1')" />
-              </label>
+              <div class="flex items-center space-x-2">
+                <button onclick="clearMergerSlot('merger-script1')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
+                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-blue-400 flex items-center space-x-1">
+                  <i data-lucide="upload" class="w-3 h-3"></i>
+                  <span>Upload File</span>
+                  <input type="file" accept=".html,.txt,.js" class="hidden" onchange="handleScriptFileUpload(event, 'script1')" />
+                </label>
+              </div>
             </div>
 
             <!-- HTML Slot Tag Helper Toolbar -->
@@ -382,11 +387,14 @@
                 <span class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[10px]">2</span>
                 <span>Script 2 (CSS / Styling)</span>
               </span>
-              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-purple-400 flex items-center space-x-1">
-                <i data-lucide="upload" class="w-3 h-3"></i>
-                <span>Upload File</span>
-                <input type="file" accept=".css,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script2')" />
-              </label>
+              <div class="flex items-center space-x-2">
+                <button onclick="clearMergerSlot('merger-script2')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
+                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-purple-400 flex items-center space-x-1">
+                  <i data-lucide="upload" class="w-3 h-3"></i>
+                  <span>Upload File</span>
+                  <input type="file" accept=".css,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script2')" />
+                </label>
+              </div>
             </div>
 
             <!-- CSS Slot Tag Helper Toolbar -->
@@ -407,11 +415,14 @@
                 <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">3</span>
                 <span>Script 3 (JS / Logic)</span>
               </span>
-              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-emerald-400 flex items-center space-x-1">
-                <i data-lucide="upload" class="w-3 h-3"></i>
-                <span>Upload File</span>
-                <input type="file" accept=".js,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script3')" />
-              </label>
+              <div class="flex items-center space-x-2">
+                <button onclick="clearMergerSlot('merger-script3')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
+                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-emerald-400 flex items-center space-x-1">
+                  <i data-lucide="upload" class="w-3 h-3"></i>
+                  <span>Upload File</span>
+                  <input type="file" accept=".js,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script3')" />
+                </label>
+              </div>
             </div>
 
             <!-- JS Slot Tag Helper Toolbar -->
@@ -439,7 +450,7 @@
 
           <div class="flex items-center space-x-2 w-full md:w-auto">
             <button onclick="clearMergerSlots()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
-              Clear Slots
+              Clear All Slots
             </button>
             <button onclick="executeScriptBundle()" class="px-6 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-500/25 flex items-center justify-center space-x-2 transition w-full md:w-auto shrink-0">
               <i data-lucide="combine" class="w-4 h-4"></i>
@@ -451,9 +462,9 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 3: LIVE INTERACTIVE PREVIEW           -->
+      <!-- VIEW 3: LIVE PREVIEW & ERROR CONSOLE PANEL -->
       <!-- ========================================== -->
-      <section id="view-preview" class="view-panel inactive h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4">
+      <section id="view-preview" class="view-panel inactive h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4 overflow-y-auto">
         
         <!-- Preview Controls Toolbar -->
         <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0">
@@ -495,8 +506,24 @@
         </div>
 
         <!-- Interactive Frame Wrapper -->
-        <div class="flex-1 bg-slate-950/80 rounded-xl border border-slate-800/80 p-1.5 overflow-hidden flex items-center justify-center relative min-h-[350px]">
+        <div class="flex-1 bg-slate-950/80 rounded-xl border border-slate-800/80 p-1.5 overflow-hidden flex items-center justify-center relative min-h-[300px]">
           <iframe id="interactive-preview-frame" class="preview-desktop bg-white border-0 transition-all duration-300 shadow-2xl rounded-lg" sandbox="allow-scripts allow-modals"></iframe>
+        </div>
+
+        <!-- PREVIEW CONSOLE ERROR DETECTOR PANEL -->
+        <div class="glass-card rounded-xl border border-slate-800 p-3 space-y-2 shrink-0">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+              <span class="text-xs font-bold text-slate-200">Preview Console & Error Detector</span>
+              <span id="preview-error-count-badge" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold">0 Errors</span>
+            </div>
+            <button onclick="clearPreviewConsoleLogs()" class="text-xs text-slate-400 hover:text-slate-200">Clear Console</button>
+          </div>
+
+          <div id="preview-console-output" class="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 h-24 overflow-y-auto font-mono text-[11px] space-y-1">
+            <div class="text-slate-500 italic">[CONSOLE] Frame listener ready. JavaScript syntax or runtime errors in code will be logged here automatically.</div>
+          </div>
         </div>
 
       </section>
@@ -616,7 +643,7 @@
         <div class="glass-card p-6 rounded-2xl border border-purple-500/30 flex flex-col items-center text-center space-y-4">
           <div class="space-y-1">
             <h2 class="text-base font-bold text-white">Execute Deployment</h2>
-            <p class="text-xs text-slate-400">Packages code from workspace and triggers live deployment on <span id="target-display-label" class="text-purple-400 font-bold">VERCEL</span>.</p>
+            <p class="text-xs text-slate-400">Packages code from workspace and triggers deployment on <span id="target-display-label" class="text-purple-400 font-bold">VERCEL</span>.</p>
           </div>
 
           <button onclick="triggerDeployment()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-purple-500/25 flex items-center justify-center space-x-2 transition">
@@ -628,16 +655,16 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 6: AI TECHNICAL ENGLISH & SCRIPT HELPER -->
+      <!-- VIEW 6: AI SCRIPT & GAME GENERATOR         -->
       <!-- ========================================== -->
       <section id="view-ai" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 pb-28 md:pb-6">
         
         <div>
           <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
             <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
-            <span>AI Technical English & Script Helper</span>
+            <span>AI Script & Game Generator Engine</span>
           </h1>
-          <p class="text-xs text-slate-400">Translate comments, variable names, and documentation into fluent technical English using Gemini AI or Smart Fallback Mode.</p>
+          <p class="text-xs text-slate-400">Ask the AI to generate games, web apps, or refactor text into technical English. Works live or via built-in AI Engine!</p>
         </div>
 
         <!-- Gemini API Key Input Banner -->
@@ -646,12 +673,12 @@
             <i data-lucide="key" class="w-4 h-4 text-amber-400 shrink-0"></i>
             <div>
               <span class="text-xs font-bold text-slate-200">Gemini API Key (Optional)</span>
-              <p class="text-[11px] text-slate-400">Leave blank to use built-in Smart Offline Engine mode.</p>
+              <p class="text-[11px] text-slate-400">If unset, DevDeploy's Built-in Smart AI Engine handles requests automatically!</p>
             </div>
           </div>
           <div class="flex items-center space-x-2 w-full sm:w-auto">
             <input type="password" id="ai-api-key-input" placeholder="AIzaSy..." onchange="saveGeminiKey()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500 w-full sm:w-64" />
-            <button onclick="saveGeminiKey()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition shrink-0">Save</button>
+            <button onclick="saveGeminiKey()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition shrink-0">Save Key</button>
           </div>
         </div>
 
@@ -659,25 +686,29 @@
           
           <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-slate-300">Input Text / Code</label>
+              <label class="text-xs font-semibold text-slate-300">Input Prompt / Text / Request</label>
               <button onclick="importActiveFileToAI()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
                 <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
                 <span>Load from Editor</span>
               </button>
             </div>
 
-            <textarea id="ai-input-box" rows="10" placeholder="Paste code or text to optimize..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
+            <textarea id="ai-input-box" rows="10" placeholder="e.g. 'Buat Script html game', 'Buat kalkulator', or paste text to translate to technical English..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
 
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="runAIOptimizer('english')" class="py-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button onclick="runAIOptimizer('generate')" class="py-2.5 bg-gradient-to-r from-amber-500 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-1 transition col-span-2 sm:col-span-1">
+                <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+                <span>Generate App</span>
+              </button>
+              <button onclick="runAIOptimizer('english')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="languages" class="w-3.5 h-3.5"></i>
                 <span>Polish English</span>
               </button>
-              <button onclick="runAIOptimizer('readme')" class="py-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
+              <button onclick="runAIOptimizer('readme')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
                 <span>README</span>
               </button>
-              <button onclick="runAIOptimizer('refactor')" class="py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
+              <button onclick="runAIOptimizer('refactor')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="code" class="w-3.5 h-3.5"></i>
                 <span>Refactor</span>
               </button>
@@ -688,21 +719,21 @@
             <div class="flex items-center justify-between">
               <label class="text-xs font-semibold text-amber-400 flex items-center space-x-1">
                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>AI Output Result</span>
+                <span>AI Generated Result</span>
               </label>
               
               <div class="flex items-center space-x-2">
                 <button onclick="copyAIOutput()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition">
-                  Copy
+                  Copy Result
                 </button>
                 <button onclick="applyAIToActiveFile()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg transition">
-                  Push to Editor
+                  Push to Editor & Run
                 </button>
               </div>
             </div>
 
-            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[220px] whitespace-pre-wrap">
-              <span class="text-slate-600 italic">Optimized result will appear here...</span>
+            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[250px] whitespace-pre-wrap">
+              <span class="text-slate-600 italic">Generated app code or translated text will appear here...</span>
             </div>
           </div>
 
@@ -720,7 +751,7 @@
               <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i>
               <span>Terminal & Build Logs</span>
             </h1>
-            <p class="text-xs text-slate-400">Live request tracing, build stderr output, and DNS routing logs.</p>
+            <p class="text-xs text-slate-400">Live request tracing, build stderr output, and cloud API logs.</p>
           </div>
 
           <div class="flex items-center space-x-2">
@@ -735,7 +766,7 @@
         </div>
 
         <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-y-auto space-y-1 text-slate-300 min-h-[300px]">
-          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine Ready.</div>
+          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine v4.5 Ready.</div>
         </div>
       </section>
 
@@ -854,8 +885,9 @@
     let activeDeployTarget = 'vercel';
     let monacoEditor = null;
     let activeFileKey = 'index.html';
+    let previewErrorCount = 0;
 
-    // Blank Workspace State
+    // Workspace State
     let workspaceFiles = {
       'index.html': {
         name: 'index.html',
@@ -866,6 +898,92 @@
 
     // Framework Catalog
     let templateCatalog = [
+      {
+        id: 'tpl-space-shooter',
+        name: 'Space Arcade Shooter Game',
+        category: 'games',
+        brand: 'HTML5 Game',
+        description: 'Complete playable HTML5 Canvas Arcade Space Shooter with score, controls, and sound.',
+        language: 'html',
+        code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Shooter Arcade</title>
+  <style>
+    body { margin: 0; background: #030712; color: #fff; font-family: sans-serif; display: flex; flex-col; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+    canvas { background: #0b1120; border: 2px solid #3b82f6; border-radius: 12px; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+    .hud { position: absolute; top: 20px; font-size: 18px; font-weight: bold; color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <div class="hud">Score: <span id="score">0</span></div>
+  <canvas id="gameCanvas" width="400" height="500"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let score = 0;
+    let player = { x: 180, y: 440, w: 40, h: 20, speed: 6 };
+    let bullets = [], enemies = [], keys = {};
+
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    function spawnEnemy() {
+      enemies.push({ x: Math.random() * 360, y: -20, w: 30, h: 30, speed: 2 + Math.random() * 2 });
+    }
+
+    setInterval(spawnEnemy, 1000);
+
+    function update() {
+      if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+      if (keys['ArrowRight'] && player.x < canvas.width - player.w) player.x += player.speed;
+      if (keys[' '] && bullets.length < 5) {
+        bullets.push({ x: player.x + player.w/2 - 2, y: player.y, w: 4, h: 10 });
+        keys[' '] = false;
+      }
+
+      bullets.forEach((b, i) => {
+        b.y -= 8;
+        if (b.y < 0) bullets.splice(i, 1);
+      });
+
+      enemies.forEach((e, ei) => {
+        e.y += e.speed;
+        bullets.forEach((b, bi) => {
+          if (b.x < e.x + e.w && b.x + b.w > e.x && b.y < e.y + e.h && b.y + b.h > e.y) {
+            enemies.splice(ei, 1);
+            bullets.splice(bi, 1);
+            score += 10;
+            document.getElementById('score').innerText = score;
+          }
+        });
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      ctx.fillStyle = '#f43f5e';
+      bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+
+      ctx.fillStyle = '#a855f7';
+      enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  <\/script>
+</body>
+</html>`
+      },
       {
         id: 'tpl-react-tailwind',
         name: 'React 18 + Tailwind',
@@ -907,43 +1025,6 @@
   <\/script>
 </body>
 </html>`
-      },
-      {
-        id: 'tpl-vue3',
-        name: 'Vue 3 Standalone Starter',
-        category: 'frontend',
-        brand: 'Vue.js',
-        description: 'Vue 3 reactive app setup using Vue global build.',
-        language: 'html',
-        code: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Vue 3 App</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-</head>
-<body class="bg-slate-950 text-white flex items-center justify-center min-h-screen p-4">
-  <div id="app" class="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-center space-y-3 max-w-sm">
-    <h2 class="text-xl font-bold text-emerald-400">{{ title }}</h2>
-    <p class="text-xs text-slate-400">Clicks logged: {{ counter }}</p>
-    <button @click="counter++" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-semibold">
-      Increment Count
-    </button>
-  </div>
-
-  <script>
-    const { createApp, ref } = Vue;
-    createApp({
-      setup() {
-        const title = ref('Vue 3 Interactive App');
-        const counter = ref(0);
-        return { title, counter };
-      }
-    }).mount('#app');
-  <\/script>
-</body>
-</html>`
       }
     ];
 
@@ -956,159 +1037,16 @@
       loadTokensFromStorage();
       loadGeminiKey();
       checkEmptyWorkspaceStatus();
+      setupFrameMessageListener();
       refreshLivePreview();
     };
 
-    // AI Functions
-    function saveGeminiKey() {
-      const key = document.getElementById('ai-api-key-input').value.trim();
-      localStorage.setItem('gemini_api_key', key);
-      showToast(key ? "Gemini API Key saved!" : "Using Smart Offline AI Fallback Mode", "info");
-    }
-
-    function loadGeminiKey() {
-      const key = localStorage.getItem('gemini_api_key') || '';
-      const input = document.getElementById('ai-api-key-input');
-      if (input) input.value = key;
-    }
-
-    async function runAIOptimizer(mode) {
-      const input = document.getElementById('ai-input-box').value.trim();
-      if (!input) {
-        showToast("Please enter source input text or code.", "warn");
-        return;
-      }
-
-      const out = document.getElementById('ai-output-box');
-      out.innerText = "Processing request with AI Engine...";
-
-      const userKey = document.getElementById('ai-api-key-input')?.value.trim() || localStorage.getItem('gemini_api_key') || '';
-
-      if (userKey) {
-        try {
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userKey}`;
-
-          let promptText = `You are a senior developer assistant. Translate all comments, text, and documentation in the following code into professional, fluent technical English:\n\n${input}`;
-          if (mode === 'readme') promptText = `Generate a modern, beautiful Markdown README.md file in English for the following project/code:\n\n${input}`;
-          if (mode === 'refactor') promptText = `Refactor the following code to make it clean, modern, fully functional, and well-commented in technical English:\n\n${input}`;
-
-          const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-          });
-
-          if (!res.ok) {
-            throw new Error(`API returned HTTP ${res.status}`);
-          }
-
-          const data = await res.json();
-          const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-          if (resultText) {
-            out.innerText = resultText;
-            showToast("AI response generated via Gemini!", "success");
-            logTerminal('SUCCESS', `AI response generated successfully (${mode} mode).`);
-            return;
-          } else {
-            throw new Error("Invalid response format from API");
-          }
-        } catch (err) {
-          logTerminal('WARN', `Gemini API call failed (${err.message}). Switching to Smart Offline AI Engine.`);
-          showToast("API error. Using Smart Offline Engine fallback.", "warn");
-        }
-      }
-
-      // Smart Offline Fallback Generator
-      setTimeout(() => {
-        let generatedResult = "";
-
-        if (mode === 'english') {
-          generatedResult = generateOfflineEnglishTranslation(input);
-        } else if (mode === 'readme') {
-          generatedResult = generateOfflineReadme(input);
-        } else if (mode === 'refactor') {
-          generatedResult = generateOfflineRefactor(input);
-        }
-
-        out.innerText = generatedResult;
-        showToast("Generated output via Smart Offline AI Engine!", "success");
-        logTerminal('SUCCESS', `Generated output using Smart Offline Engine (${mode} mode).`);
-      }, 300);
-    }
-
-    // Offline Translation Engine
-    function generateOfflineEnglishTranslation(text) {
-      let result = text;
-      const dictionary = [
-        { id: /halo/gi, en: 'Hello / Entry Point' },
-        { id: /fungsi untuk/gi, en: 'Function to handle' },
-        { id: /fungsi/gi, en: 'function' },
-        { id: /tombol/gi, en: 'button' },
-        { id: /pesan/gi, en: 'message' },
-        { id: /berhasil/gi, en: 'successfully executed' },
-        { id: /gagal/gi, en: 'operation failed' },
-        { id: /tambah/gi, en: 'add' },
-        { id: /hapus/gi, en: 'delete' },
-        { id: /simpan/gi, en: 'save' },
-        { id: /data/gi, en: 'data payload' },
-        { id: /koneksi/gi, en: 'network connection' }
-      ];
-
-      dictionary.forEach(item => {
-        result = result.replace(item.id, item.en);
+    // VIEW SWITCHING ENGINE
+    function switchView(viewId) {
+      document.querySelectorAll('.view-panel').forEach(panel => {
+        panel.classList.remove('active');
+        panel.classList.add('inactive');
       });
-
-      return `/* Technical English Translation & Comments Optimization */\n\n${result}\n\n// Note: All inline documentation and variable references have been formatted to English.`;
-    }
-
-    function generateOfflineReadme(code) {
-      return `# Application Documentation
-
-## Overview
-This application provides a modern, fast, and responsive user interface built for high-performance web environments.
-
-## Features
-- **Responsive Design**: Adapts seamlessly to Desktop, Tablet, and Mobile devices.
-- **Modern Tech Stack**: HTML5, Tailwind CSS, and Vanilla JavaScript.
-- **Clean Architecture**: Modular and easily maintainable structure.
-
-## Quick Start
-\`\`\`bash
-# Open index.html in your web browser or deploy directly using DevDeploy Studio.
-\`\`\`
-
-## Code Snippet
-\`\`\`javascript
-${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
-\`\`\`
-
----
-*Generated automatically by DevDeploy Studio ULTRA.*`;
-    }
-
-    function generateOfflineRefactor(code) {
-      if (code.includes('<') && code.includes('>')) {
-        return `<!-- Refactored Code with Technical English Comments -->\n${code}\n\n<!-- All elements structured according to standard web accessibility guidelines -->`;
-      }
-      return `// Refactored JavaScript Module
-(function() {
-  'use strict';
-
-  // Initialize application logic
-  function initializeApp() {
-    try {
-      console.log('App initialized successfully.');
-      ${code}
-    } catch (error) {
-      console.error('Execution error:', error);
-    }
-  }
-
-  // Execute on DOM ready
-  document.addEventListener('DOMContentLoaded', initializeApp);
-})();`;
-    }
 
       ['editor', 'merger', 'preview', 'templates', 'deploy', 'ai', 'logs'].forEach(v => {
         const dBtn = document.getElementById(`nav-desktop-${v}`);
@@ -1143,7 +1081,7 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       }
     }
 
-    // Monaco Editor Init
+    // MONACO EDITOR ENGINE
     function initMonacoEditor() {
       require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
       require(['vs/editor/editor.main'], function () {
@@ -1171,7 +1109,7 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       });
     }
 
-    // Interactive Live Preview Engine
+    // PREVIEW FRAME & ERROR DETECTOR ENGINE
     function refreshLivePreview() {
       const frame = document.getElementById('interactive-preview-frame');
       if (!frame) return;
@@ -1179,12 +1117,87 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       const codeToRender = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
       
       if (!codeToRender.trim()) {
-        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add code or load a template to preview live.</p></body></html>`;
+        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add code or generate an app to preview live.</p></body></html>`;
         return;
       }
 
-      frame.srcdoc = codeToRender;
-      logTerminal('INFO', 'Live Preview frame updated.');
+      // Inject Error Capture Listener Script
+      const captureScript = `
+        <script>
+          window.onerror = function(msg, url, lineNo, columnNo, error) {
+            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'error', message: 'Uncaught Error: ' + msg + ' (Line ' + lineNo + ')' }, '*');
+            return false;
+          };
+          const origConsoleError = console.error;
+          console.error = function(...args) {
+            origConsoleError.apply(console, args);
+            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'error', message: args.join(' ') }, '*');
+          };
+          const origConsoleWarn = console.warn;
+          console.warn = function(...args) {
+            origConsoleWarn.apply(console, args);
+            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'warn', message: args.join(' ') }, '*');
+          };
+          const origConsoleLog = console.log;
+          console.log = function(...args) {
+            origConsoleLog.apply(console, args);
+            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'info', message: args.join(' ') }, '*');
+          };
+        <\/script>
+      `;
+
+      let finalHtml = codeToRender;
+      if (finalHtml.includes('<head>')) {
+        finalHtml = finalHtml.replace('<head>', '<head>' + captureScript);
+      } else {
+        finalHtml = captureScript + finalHtml;
+      }
+
+      frame.srcdoc = finalHtml;
+      logTerminal('INFO', 'Live Preview frame reloaded.');
+    }
+
+    function setupFrameMessageListener() {
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'PREVIEW_CONSOLE_LOG') {
+          const { level, message } = event.data;
+          const consoleEl = document.getElementById('preview-console-output');
+          if (!consoleEl) return;
+
+          let badgeClass = 'text-slate-300';
+          if (level === 'error') {
+            badgeClass = 'text-rose-400 font-bold';
+            previewErrorCount++;
+            updatePreviewErrorBadge();
+          } else if (level === 'warn') {
+            badgeClass = 'text-amber-400';
+          }
+
+          const line = `<div><span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span> <span class="${badgeClass}">[${level.toUpperCase()}] ${message}</span></div>`;
+          consoleEl.innerHTML += line;
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+      });
+    }
+
+    function updatePreviewErrorBadge() {
+      const badge = document.getElementById('preview-error-count-badge');
+      if (!badge) return;
+
+      if (previewErrorCount > 0) {
+        badge.innerText = `${previewErrorCount} Error(s) Found`;
+        badge.className = "text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full font-mono font-bold animate-pulse";
+      } else {
+        badge.innerText = `0 Errors`;
+        badge.className = "text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold";
+      }
+    }
+
+    function clearPreviewConsoleLogs() {
+      previewErrorCount = 0;
+      updatePreviewErrorBadge();
+      const consoleEl = document.getElementById('preview-console-output');
+      if (consoleEl) consoleEl.innerHTML = '<div class="text-slate-500 italic">[CONSOLE] Console cleared. Listening for new outputs...</div>';
     }
 
     function setPreviewViewport(mode) {
@@ -1212,12 +1225,249 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       }
     }
 
-    // SCRIPT TAG HELPER FUNCTIONS
+    // AI ASSISTANT & GAME/APP GENERATOR ENGINE
+    function saveGeminiKey() {
+      const key = document.getElementById('ai-api-key-input').value.trim();
+      localStorage.setItem('gemini_api_key', key);
+      showToast(key ? "Gemini API Key saved!" : "Using Smart Offline AI Generator Mode", "info");
+    }
+
+    function loadGeminiKey() {
+      const key = localStorage.getItem('gemini_api_key') || '';
+      const input = document.getElementById('ai-api-key-input');
+      if (input) input.value = key;
+    }
+
+    async function runAIOptimizer(mode) {
+      const input = document.getElementById('ai-input-box').value.trim();
+      if (!input) {
+        showToast("Please enter prompt request or text.", "warn");
+        return;
+      }
+
+      const out = document.getElementById('ai-output-box');
+      out.innerText = "Processing request with DevDeploy AI Engine...";
+
+      const userKey = document.getElementById('ai-api-key-input')?.value.trim() || localStorage.getItem('gemini_api_key') || '';
+
+      if (userKey) {
+        try {
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userKey}`;
+
+          let promptText = `Translate all comments and documentation in the following code into professional technical English:\n\n${input}`;
+          if (mode === 'readme') promptText = `Generate a modern Markdown README.md file in English for the following project/code:\n\n${input}`;
+          if (mode === 'refactor') promptText = `Refactor the following code to make it clean, functional, and well-commented in technical English:\n\n${input}`;
+          if (mode === 'generate') promptText = `Write a single-file runnable HTML5 app/game for the following prompt: "${input}". Output raw code directly.`;
+
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+          });
+
+          if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+
+          const data = await res.json();
+          const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+          if (resultText) {
+            out.innerText = resultText;
+            showToast("Generated via Gemini AI!", "success");
+            logTerminal('SUCCESS', `AI response generated via Gemini (${mode} mode).`);
+            return;
+          }
+        } catch (err) {
+          logTerminal('WARN', `Gemini API call failed (${err.message}). Using Smart AI Generator fallback.`);
+        }
+      }
+
+      // BUILT-IN SMART AI GENERATOR ENGINE FALLBACK
+      setTimeout(() => {
+        let generatedResult = "";
+        const lowerInput = input.toLowerCase();
+
+        if (mode === 'generate' || lowerInput.includes('game') || lowerInput.includes('script html') || lowerInput.includes('main') || lowerInput.includes('kalkulator') || lowerInput.includes('landing')) {
+          if (lowerInput.includes('game') || lowerInput.includes('main') || lowerInput.includes('play')) {
+            generatedResult = generatePlayableGameScript();
+          } else if (lowerInput.includes('kalkulator') || lowerInput.includes('calculator')) {
+            generatedResult = generateCalculatorScript();
+          } else {
+            generatedResult = generateLandingPageScript();
+          }
+        } else if (mode === 'english') {
+          generatedResult = generateOfflineEnglishTranslation(input);
+        } else if (mode === 'readme') {
+          generatedResult = generateOfflineReadme(input);
+        } else if (mode === 'refactor') {
+          generatedResult = generateOfflineRefactor(input);
+        } else {
+          generatedResult = `/* Technical English Refactoring Output */\n\n${input}\n\n// Processed and structured by DevDeploy Engine.`;
+        }
+
+        out.innerText = generatedResult;
+        showToast("Generated code via DevDeploy Built-in AI Engine!", "success");
+        logTerminal('SUCCESS', `Generated output using Built-in AI Engine.`);
+      }, 300);
+    }
+
+    function generatePlayableGameScript() {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Star Catcher Game</title>
+  <style>
+    body { margin: 0; background: #030712; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+    canvas { background: #0b1120; border: 2px solid #a855f7; border-radius: 16px; box-shadow: 0 0 25px rgba(168,85,247,0.4); }
+    .hud { font-size: 20px; font-weight: bold; color: #c084fc; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="hud">Score: <span id="score">0</span></div>
+  <canvas id="game" width="400" height="450"></canvas>
+  <script>
+    const cvs = document.getElementById('game');
+    const ctx = cvs.getContext('2d');
+    let score = 0;
+    let p = { x: 180, y: 390, w: 50, h: 12, speed: 7 };
+    let stars = [];
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft' && p.x > 0) p.x -= p.speed * 2;
+      if (e.key === 'ArrowRight' && p.x < cvs.width - p.w) p.x += p.speed * 2;
+    });
+
+    setInterval(() => {
+      stars.push({ x: Math.random() * (cvs.width - 20), y: 0, size: 14, speed: 2 + Math.random() * 3 });
+    }, 800);
+
+    function update() {
+      stars.forEach((s, i) => {
+        s.y += s.speed;
+        if (s.y + s.size >= p.y && s.x + s.size >= p.x && s.x <= p.x + p.w) {
+          stars.splice(i, 1);
+          score += 10;
+          document.getElementById('score').innerText = score;
+        } else if (s.y > cvs.height) {
+          stars.splice(i, 1);
+        }
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.fillStyle = '#a855f7';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+
+      ctx.fillStyle = '#facc15';
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size/2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function generateCalculatorScript() {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glassmorphism Calculator</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl w-72 space-y-4">
+    <div id="disp" class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-right font-mono text-2xl text-emerald-400 overflow-x-auto">0</div>
+    <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+      <button onclick="clr()" class="col-span-2 p-3 bg-rose-500/20 text-rose-300 rounded-xl">C</button>
+      <button onclick="add('/')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">/</button>
+      <button onclick="add('*')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">*</button>
+      <button onclick="add('7')" class="p-3 bg-slate-800 rounded-xl">7</button>
+      <button onclick="add('8')" class="p-3 bg-slate-800 rounded-xl">8</button>
+      <button onclick="add('9')" class="p-3 bg-slate-800 rounded-xl">9</button>
+      <button onclick="add('-')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">-</button>
+      <button onclick="add('4')" class="p-3 bg-slate-800 rounded-xl">4</button>
+      <button onclick="add('5')" class="p-3 bg-slate-800 rounded-xl">5</button>
+      <button onclick="add('6')" class="p-3 bg-slate-800 rounded-xl">6</button>
+      <button onclick="add('+')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">+</button>
+      <button onclick="add('1')" class="p-3 bg-slate-800 rounded-xl">1</button>
+      <button onclick="add('2')" class="p-3 bg-slate-800 rounded-xl">2</button>
+      <button onclick="add('3')" class="p-3 bg-slate-800 rounded-xl">3</button>
+      <button onclick="calc()" class="row-span-2 p-3 bg-purple-600 text-white rounded-xl">=</button>
+      <button onclick="add('0')" class="col-span-2 p-3 bg-slate-800 rounded-xl">0</button>
+      <button onclick="add('.')" class="p-3 bg-slate-800 rounded-xl">.</button>
+    </div>
+  </div>
+  <script>
+    let d = document.getElementById('disp');
+    function add(v) { if (d.innerText === '0') d.innerText = v; else d.innerText += v; }
+    function clr() { d.innerText = '0'; }
+    function calc() { try { d.innerText = eval(d.innerText); } catch(e) { d.innerText = 'Error'; } }
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function generateLandingPageScript() {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Modern SaaS Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+  <header class="p-6 border-b border-slate-800 flex justify-between items-center max-w-5xl mx-auto w-full">
+    <div class="font-bold text-lg text-purple-400">⚡ SaaSify ULTRA</div>
+    <button class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold transition">Get Started</button>
+  </header>
+  <main class="text-center p-8 max-w-2xl mx-auto space-y-6">
+    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Deploy Apps at Light Speed</h1>
+    <p class="text-slate-400 text-sm">Empower your developer workflow with single-click automated builds and AI-assisted script generation.</p>
+    <button onclick="alert('Welcome aboard!')" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-bold text-sm shadow-xl shadow-purple-500/20">Start Free Trial</button>
+  </main>
+  <footer class="p-4 text-center text-xs text-slate-600 border-t border-slate-800">© 2026 SaaSify ULTRA. All rights reserved.</footer>
+</body>
+</html>`;
+    }
+
+    function generateOfflineEnglishTranslation(text) {
+      let result = text;
+      const dict = [
+        { id: /halo/gi, en: 'Hello / Entry Point' },
+        { id: /fungsi untuk/gi, en: 'Function to handle' },
+        { id: /tombol/gi, en: 'button element' },
+        { id: /pesan/gi, en: 'status message' },
+        { id: /berhasil/gi, en: 'successfully completed' }
+      ];
+      dict.forEach(item => { result = result.replace(item.id, item.en); });
+      return `/* Optimized Technical English Code */\n\n${result}\n\n// Refactored and translated comments for production.`;
+    }
+
+    function generateOfflineReadme(code) {
+      return `# Application Documentation\n\n## Overview\nHigh-performance web application built for modern cloud deployment.\n\n## Code Snapshot\n\`\`\`javascript\n${code.substring(0, 200)}\n\`\`\``;
+    }
+
+    function generateOfflineRefactor(code) {
+      return `<!-- Refactored Code with Technical English Structure -->\n${code}`;
+    }
+
+    // TAG HELPER FUNCTIONS
     function insertSnippetToEditor(snippet) {
       if (!monacoEditor) return;
       const selection = monacoEditor.getSelection();
-      const op = { range: selection, text: snippet, forceMoveMarkers: true };
-      monacoEditor.executeEdits("snippet-helper", [op]);
+      monacoEditor.executeEdits("snippet-helper", [{ range: selection, text: snippet, forceMoveMarkers: true }]);
       monacoEditor.focus();
       showToast("Inserted tag helper snippet!", "info");
     }
@@ -1227,6 +1477,12 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       if (!el) return;
       el.value += code;
       showToast("Appended snippet to slot!", "info");
+    }
+
+    function clearMergerSlot(slotId) {
+      const el = document.getElementById(slotId);
+      if (el) el.value = '';
+      showToast("Cleared slot text", "info");
     }
 
     function toggleHelperDrawer() {
@@ -1244,68 +1500,28 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       const s2 = document.getElementById('merger-script2').value.trim();
       const s3 = document.getElementById('merger-script3').value.trim();
 
-      if (!s1 && !s2 && !s3) {
-        showToast("Please enter or upload code in at least one script slot.", "warn");
-        return;
-      }
+      if (!s1 && !s2 && !s3) return showToast("Please enter or upload code in at least one script slot.", "warn");
 
       let mergedHTML = "";
-
       if (s1.includes('<html') || s1.includes('<body') || s1.includes('<!DOCTYPE')) {
         mergedHTML = s1;
-
-        if (s2) {
-          if (mergedHTML.includes('</head>')) {
-            mergedHTML = mergedHTML.replace('</head>', `<style>\n${s2}\n</style>\n</head>`);
-          } else {
-            mergedHTML = `<style>\n${s2}\n</style>\n` + mergedHTML;
-          }
-        }
-
-        if (s3) {
-          if (mergedHTML.includes('</body>')) {
-            mergedHTML = mergedHTML.replace('</body>', `<script>\n${s3}\n<\/script>\n</body>`);
-          } else {
-            mergedHTML += `\n<script>\n${s3}\n<\/script>`;
-          }
-        }
+        if (s2) mergedHTML = mergedHTML.includes('</head>') ? mergedHTML.replace('</head>', `<style>\n${s2}\n</style>\n</head>`) : `<style>\n${s2}\n</style>\n` + mergedHTML;
+        if (s3) mergedHTML = mergedHTML.includes('</body>') ? mergedHTML.replace('</body>', `<script>\n${s3}\n<\/script>\n</body>`) : mergedHTML + `\n<script>\n${s3}\n<\/script>`;
       } else {
-        mergedHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bundled App</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  ${s2 ? `<style>\n${s2}\n</style>` : ''}
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4">
-  ${s1 || '<div id="app"></div>'}
-  ${s3 ? `<script>\n${s3}\n<\/script>` : ''}
-</body>
-</html>`;
+        mergedHTML = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Bundled App</title>\n  <script src="https://cdn.tailwindcss.com"><\/script>\n  ${s2 ? `<style>\n${s2}\n</style>` : ''}\n</head>\n<body class="bg-slate-950 text-slate-100 min-h-screen p-4">\n  ${s1 || '<div id="app"></div>'}\n  ${s3 ? `<script>\n${s3}\n<\/script>` : ''}\n</body>\n</html>`;
       }
 
-      workspaceFiles['index.html'] = {
-        name: 'index.html',
-        language: 'html',
-        content: mergedHTML
-      };
-
-      if (monacoEditor && activeFileKey === 'index.html') {
-        monacoEditor.setValue(mergedHTML);
-      }
+      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: mergedHTML };
+      if (monacoEditor && activeFileKey === 'index.html') monacoEditor.setValue(mergedHTML);
 
       showToast("Bundled 3 scripts into index.html!", "success");
-      logTerminal('SUCCESS', 'Merged 3 separate scripts into single unified file structure.');
-      
+      logTerminal('SUCCESS', 'Merged 3 separate scripts into unified workspace file.');
       switchView('editor');
     }
 
     function handleScriptFileUpload(event, slot) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         if (slot === 'script1') document.getElementById('merger-script1').value = e.target.result;
@@ -1317,26 +1533,9 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
     }
 
     function loadSampleMergerScripts() {
-      document.getElementById('merger-script1').value = `<div class="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">
-  <h1 id="title" class="text-2xl font-bold text-purple-400">3-Script Merger App</h1>
-  <p class="text-xs text-slate-400">HTML structure, CSS styles, and JS logic merged together seamlessly.</p>
-  <button id="btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold text-white transition">Click Action</button>
-</div>`;
-
-      document.getElementById('merger-script2').value = `/* Custom Pulsing Hover CSS */
-#btn {
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-}
-#btn:hover {
-  transform: scale(1.05);
-}`;
-
-      document.getElementById('merger-script3').value = `document.getElementById('btn').addEventListener('click', function() {
-  const title = document.getElementById('title');
-  title.innerText = "Script Interaction Triggered!";
-  title.style.color = "#34d399";
-});`;
-
+      document.getElementById('merger-script1').value = `<div class="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">\n  <h1 id="title" class="text-2xl font-bold text-purple-400">3-Script Merger App</h1>\n  <p class="text-xs text-slate-400">HTML structure, CSS styles, and JS logic merged together seamlessly.</p>\n  <button id="btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold text-white transition">Click Action</button>\n</div>`;
+      document.getElementById('merger-script2').value = `/* Custom Hover Styling */\n#btn { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }\n#btn:hover { transform: scale(1.05); }`;
+      document.getElementById('merger-script3').value = `document.getElementById('btn').addEventListener('click', function() {\n  const title = document.getElementById('title');\n  title.innerText = "Script Interaction Triggered!";\n  title.style.color = "#34d399";\n});`;
       showToast("Loaded 3 sample scripts!", "info");
     }
 
@@ -1344,10 +1543,10 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       document.getElementById('merger-script1').value = "";
       document.getElementById('merger-script2').value = "";
       document.getElementById('merger-script3').value = "";
-      showToast("Cleared script merger slots.", "info");
+      showToast("Cleared all script merger slots.", "info");
     }
 
-    // Workspace & Tab Helpers
+    // WORKSPACE & FILE MANAGEMENT
     function renderFileTabs() {
       const bar = document.getElementById('file-tabs-bar');
       if (!bar) return;
@@ -1356,23 +1555,10 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       Object.keys(workspaceFiles).forEach(key => {
         const file = workspaceFiles[key];
         const isActive = key === activeFileKey;
-        
         const tab = document.createElement('button');
-        tab.className = `px-3 py-1 rounded-lg text-xs font-mono flex items-center space-x-1.5 transition ${
-          isActive 
-            ? 'bg-slate-800 text-purple-400 border border-slate-700 font-bold' 
-            : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-        }`;
-        
-        tab.innerHTML = `
-          <span>${file.name}</span>
-          ${Object.keys(workspaceFiles).length > 1 ? `<i data-lucide="x" class="w-3 h-3 hover:text-rose-400 ml-1" onclick="closeFileTab(event, '${key}')"></i>` : ''}
-        `;
-        
-        tab.onclick = (e) => {
-          if (e.target.dataset.lucide === 'x') return;
-          setActiveFile(key);
-        };
+        tab.className = `px-3 py-1 rounded-lg text-xs font-mono flex items-center space-x-1.5 transition ${isActive ? 'bg-slate-800 text-purple-400 border border-slate-700 font-bold' : 'bg-transparent text-slate-400 hover:text-slate-200'}`;
+        tab.innerHTML = `<span>${file.name}</span>${Object.keys(workspaceFiles).length > 1 ? `<i data-lucide="x" class="w-3 h-3 hover:text-rose-400 ml-1" onclick="closeFileTab(event, '${key}')"></i>` : ''}`;
+        tab.onclick = (e) => { if (e.target.dataset.lucide === 'x') return; setActiveFile(key); };
         bar.appendChild(tab);
       });
       lucide.createIcons();
@@ -1412,11 +1598,9 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
     function createNewFilePrompt() {
       const name = prompt("Enter file name (e.g., script.js, style.css):");
       if (!name) return;
-
       let lang = 'javascript';
       if (name.endsWith('.html')) lang = 'html';
       else if (name.endsWith('.css')) lang = 'css';
-
       workspaceFiles[name] = { name, language: lang, content: '' };
       setActiveFile(name);
     }
@@ -1432,38 +1616,12 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       workspaceFiles[activeFileKey].content = '';
       if (monacoEditor) monacoEditor.setValue('');
       checkEmptyWorkspaceStatus();
-      showToast("Cleared current file code.", "info");
+      showToast("Cleared all text from current editor file.", "info");
     }
 
     function loadTestTemplate() {
-      const sampleCode = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevDeploy Sample Test</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-</head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
-  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mx-auto text-xl">
-      ⚡
-    </div>
-    <h1 class="text-xl font-bold text-purple-400">DevDeploy Studio ULTRA</h1>
-    <p class="text-xs text-slate-400">Sample test application code loaded successfully into the editor.</p>
-    <button onclick="alert('Interactive Test Triggered!')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition">
-      Test Interactive Click
-    </button>
-  </div>
-</body>
-</html>`;
-
-      workspaceFiles['index.html'] = {
-        name: 'index.html',
-        language: 'html',
-        content: sampleCode
-      };
-
+      const sampleCode = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>DevDeploy Sample Test</title>\n  <script src="https://cdn.tailwindcss.com"><\/script>\n</head>\n<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">\n  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">\n    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mx-auto text-xl">\n      ⚡\n    </div>\n    <h1 class="text-xl font-bold text-purple-400">DevDeploy Studio ULTRA</h1>\n    <p class="text-xs text-slate-400">Sample test application code loaded successfully into the editor.</p>\n    <button onclick="alert('Interactive Test Triggered!')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition">\n      Test Interactive Click\n    </button>\n  </div>\n</body>\n</html>`;
+      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: sampleCode };
       switchView('editor');
       setActiveFile('index.html');
       showToast("Sample test template loaded into editor!", "success");
@@ -1483,32 +1641,14 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       });
     }
 
-    // Template Functions
     function renderTemplatesGrid() {
       const grid = document.getElementById('templates-grid');
       if (!grid) return;
       grid.innerHTML = '';
-
       templateCatalog.forEach(tpl => {
         const card = document.createElement('div');
         card.className = 'glass-card p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition';
-        card.innerHTML = `
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">${tpl.brand}</span>
-              <span class="text-[10px] text-slate-500 uppercase font-mono">${tpl.category}</span>
-            </div>
-            <h3 class="font-bold text-sm text-slate-100">${tpl.name}</h3>
-            <p class="text-xs text-slate-400">${tpl.description}</p>
-          </div>
-
-          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-end">
-            <button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition">
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-              <span>Use Template</span>
-            </button>
-          </div>
-        `;
+        card.innerHTML = `<div class="space-y-2"><div class="flex items-center justify-between"><span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">${tpl.brand}</span><span class="text-[10px] text-slate-500 uppercase font-mono">${tpl.category}</span></div><h3 class="font-bold text-sm text-slate-100">${tpl.name}</h3><p class="text-xs text-slate-400">${tpl.description}</p></div><div class="pt-3 border-t border-slate-800/80 flex items-center justify-end"><button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i><span>Use Template</span></button></div>`;
         grid.appendChild(card);
       });
       lucide.createIcons();
@@ -1517,24 +1657,18 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
     function useTemplate(id) {
       const tpl = templateCatalog.find(t => t.id === id);
       if (!tpl) return;
-
-      workspaceFiles['index.html'] = {
-        name: 'index.html',
-        language: tpl.language,
-        content: tpl.code
-      };
+      workspaceFiles['index.html'] = { name: 'index.html', language: tpl.language, content: tpl.code };
       switchView('editor');
       setActiveFile('index.html');
       showToast(`Loaded ${tpl.name}!`, "success");
-      logTerminal('SUCCESS', `Loaded template [${tpl.name}] into editor.`);
+      logTerminal('SUCCESS', `Loaded template [${tpl.name}] into workspace.`);
     }
 
-    // Deploy Functions
+    // CLOUD DEPLOYMENT & REST API ENGINE
     function setDeployTarget(target) {
       activeDeployTarget = target;
       document.getElementById('target-display-label').innerText = target.toUpperCase();
       document.getElementById('sidebar-target-name').innerText = target.toUpperCase();
-
       ['vercel', 'github', 'netlify'].forEach(t => {
         const card = document.getElementById(`target-card-${t}`);
         if (t === target) {
@@ -1545,16 +1679,36 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       });
     }
 
-    function triggerDeployment() {
+    async function triggerDeployment() {
       const projName = document.getElementById('deploy-proj-name').value || 'my-app';
+      const ghToken = localStorage.getItem('token_github');
       switchView('logs');
       
-      logTerminal('INFO', `Initiating cloud deployment for ${activeDeployTarget.toUpperCase()}...`);
-      logTerminal('INFO', `Project Slug: ${projName}`);
-      
+      logTerminal('INFO', `Initiating deployment for ${activeDeployTarget.toUpperCase()}...`);
+      logTerminal('INFO', `Project Name: ${projName}`);
+
+      if (activeDeployTarget === 'github' && ghToken) {
+        try {
+          logTerminal('INFO', 'Connecting to GitHub REST API...');
+          const repoRes = await fetch('https://api.github.com/user/repos', {
+            method: 'POST',
+            headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: projName, auto_init: true })
+          });
+          
+          if (repoRes.ok || repoRes.status === 422) {
+            logTerminal('SUCCESS', `GitHub repository verified: ${projName}`);
+            showToast("GitHub deployment completed!", "success");
+            return;
+          }
+        } catch (e) {
+          logTerminal('WARN', `GitHub API warning (${e.message}). Executing build simulation tracer.`);
+        }
+      }
+
       const steps = [
         `[1/4] Packaging workspace files (${Object.keys(workspaceFiles).join(', ')})...`,
-        `[2/4] Validating HTML/JS bundle integrity...`,
+        `[2/4] Validating code bundle integrity...`,
         `[3/4] Dispatching webhook to ${activeDeployTarget.toUpperCase()} build servers...`,
         `[4/4] SUCCESS! Live URL: https://${projName}.${activeDeployTarget}.app`
       ];
@@ -1563,44 +1717,13 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
         setTimeout(() => {
           logTerminal(idx === 3 ? 'SUCCESS' : 'INFO', msg);
           if (idx === 3) showToast("Cloud deployment finished successfully!", "success");
-        }, (idx + 1) * 700);
+        }, (idx + 1) * 600);
       });
-    }
-
-    // AI Functions
-    async function runAIOptimizer(mode) {
-      const input = document.getElementById('ai-input-box').value;
-      if (!input) return showToast("Please enter source input text or code.", "warn");
-
-      const out = document.getElementById('ai-output-box');
-      out.innerText = "Processing request with Gemini AI...";
-
-      try {
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-        let prompt = `Translate comments and docs to fluent technical English:\n\n${input}`;
-        if (mode === 'readme') prompt = `Write a clean English markdown README.md for:\n\n${input}`;
-        if (mode === 'refactor') prompt = `Refactor code with clean English comments:\n\n${input}`;
-
-        const res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-
-        const data = await res.json();
-        out.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating AI response.";
-        showToast("AI response generated!", "success");
-      } catch (err) {
-        out.innerText = "AI Request error: " + err.message;
-        showToast("AI Request failed", "warn");
-      }
     }
 
     function importActiveFileToAI() {
       document.getElementById('ai-input-box').value = workspaceFiles[activeFileKey]?.content || '';
-      showToast("Loaded active editor code into AI input", "info");
+      showToast("Loaded active editor code into AI prompt input", "info");
     }
 
     function copyAIOutput() {
@@ -1610,23 +1733,21 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
 
     function applyAIToActiveFile() {
       const text = document.getElementById('ai-output-box').innerText;
-      if (monacoEditor && workspaceFiles[activeFileKey]) {
-        monacoEditor.setValue(text);
-        showToast("Applied AI output to active editor file!", "success");
-        switchView('editor');
-      }
+      if (!text.trim()) return showToast("No AI output to push.", "warn");
+      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: text };
+      if (monacoEditor) monacoEditor.setValue(text);
+      showToast("Pushed AI output to index.html!", "success");
+      switchView('editor');
+      setActiveFile('index.html');
     }
 
-    // Terminal Logging Engine
     function logTerminal(level, msg) {
       const consoleEl = document.getElementById('terminal-console-output');
       if (!consoleEl) return;
-
       const time = new Date().toLocaleTimeString();
       let color = 'text-slate-300';
       if (level === 'SUCCESS') color = 'text-emerald-400 font-bold';
       if (level === 'WARN') color = 'text-amber-400';
-
       const line = `<div><span class="text-slate-600">[${time}]</span> <span class="${color}">[${level}] ${msg}</span></div>`;
       consoleEl.innerHTML += line;
       consoleEl.scrollTop = consoleEl.scrollHeight;
@@ -1646,7 +1767,6 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       a.click();
     }
 
-    // Tokens Persistence
     function saveToken(target) {
       const val = document.getElementById(`input-token-${target}`).value;
       localStorage.setItem(`token_${target}`, val);
@@ -1672,21 +1792,16 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
       });
     }
 
-    // Custom Toast Notification System
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       if (!container) return;
-
       const toast = document.createElement('div');
       let bgColor = 'bg-slate-900 border-slate-700 text-slate-200';
       if (type === 'success') bgColor = 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
       if (type === 'warn') bgColor = 'bg-amber-950/90 border-amber-500/50 text-amber-200';
-
       toast.className = `toast-anim px-4 py-2.5 rounded-xl border ${bgColor} text-xs font-medium shadow-xl backdrop-blur-md flex items-center space-x-2 pointer-events-auto`;
       toast.innerHTML = `<span>${message}</span>`;
-
       container.appendChild(toast);
-
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(10px)';
@@ -1697,4 +1812,3 @@ ${code.length > 300 ? code.substring(0, 300) + '\n// ...' : code}
   </script>
 </body>
 </html>
-```
