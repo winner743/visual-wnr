@@ -1,3 +1,3 @@
-# VISUAL WNR
+# Visual WNR
 
 Hosted on GitHub Pages.
