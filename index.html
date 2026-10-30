@@ -122,7 +122,7 @@
       </div>
       <div class="flex items-center space-x-2">
         <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-purple-400">ULTRA</span></span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.5</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.6</span>
       </div>
     </div>
 
@@ -223,7 +223,7 @@
       <section id="view-editor" class="view-panel active h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4 overflow-y-auto">
         
         <!-- Editor Header Toolbar -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0 gap-2">
+        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0 gap-2 overflow-x-auto">
           
           <!-- File Tabs Bar -->
           <div id="file-tabs-bar" class="flex items-center space-x-1.5 overflow-x-auto pr-2">
@@ -232,17 +232,30 @@
 
           <!-- Actions Bar -->
           <div class="flex items-center space-x-1.5 shrink-0">
-            <button onclick="createNewFilePrompt()" title="Add File" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition">
+            
+            <!-- NEW: Dynamic Language Dropdown -->
+            <select id="editor-lang-select" onchange="changeActiveFileLanguage(this.value)" class="bg-slate-950 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 hover:bg-slate-800 transition cursor-pointer">
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="lua">Lua</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="shell">Linux / Shell</option>
+            </select>
+
+            <button onclick="createNewFilePrompt()" title="Add File" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition flex-shrink-0">
               <i data-lucide="file-plus" class="w-4 h-4"></i>
             </button>
 
             <!-- DELETE ALL TEXT BUTTON -->
-            <button onclick="clearWorkspace()" title="Delete All Text" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-semibold flex items-center space-x-1 transition">
+            <button onclick="clearWorkspace()" title="Delete All Text" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-semibold flex items-center space-x-1 transition flex-shrink-0">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              <span>Clear Text</span>
+              <span class="hidden lg:inline">Clear Text</span>
             </button>
 
-            <button onclick="downloadZip()" title="Download Source ZIP" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium flex items-center space-x-1 transition">
+            <button onclick="downloadZip()" title="Download Source ZIP" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium flex items-center space-x-1 transition flex-shrink-0">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
               <span class="hidden sm:inline">ZIP</span>
             </button>
@@ -256,31 +269,9 @@
             <span>Quick Helper</span>
           </span>
 
-          <div class="flex items-center space-x-1.5 overflow-x-auto helper-scroll py-0.5">
-            <button onclick="insertSnippetToEditor('<h1>Title Header</h1>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;h1&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('<p>Paragraph text description...</p>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;p&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('<button class=\'btn\'>Click Me</button>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;button&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('<input type=\'text\' placeholder=\'Enter value...\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;input&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('<img src=\'https://placehold.co/300x200/1e293b/white?text=Sample+Image\' alt=\'Image\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;img&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('<div class=\'container\'>\n  \n</div>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              &lt;div&gt;
-            </button>
-            <button onclick="insertSnippetToEditor('fetch(\'https://api.example.com/data\')\n  .then(res => res.json())\n  .then(data => console.log(data));')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              fetch()
-            </button>
-            <button onclick="insertSnippetToEditor('console.log(\'Debug info:\', data);')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
-              console.log
-            </button>
+          <!-- Dynamic Helper Toolbar Container -->
+          <div id="dynamic-helper-toolbar" class="flex items-center space-x-1.5 overflow-x-auto helper-scroll py-0.5">
+            <!-- Populated via JavaScript based on language -->
           </div>
         </div>
 
@@ -301,7 +292,7 @@
                 🚀 Load Sample Test Code
               </button>
               <button onclick="switchView('ai')" class="px-4 py-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 text-xs font-medium rounded-xl transition">
-                ✨ Generate HTML Game / App
+                ✨ Generate AI Script
               </button>
               <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
                 Start Blank
@@ -316,7 +307,7 @@
         <!-- Editor Footer Status Bar -->
         <div class="bg-slate-900/90 border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-400 font-mono shrink-0">
           <div class="flex items-center space-x-3">
-            <span id="active-lang-badge" class="text-purple-400 font-bold">HTML</span>
+            <span id="active-lang-badge" class="text-purple-400 font-bold uppercase">HTML</span>
             <span>UTF-8</span>
           </div>
           <div class="flex items-center space-x-3">
@@ -765,7 +756,8 @@
         </div>
 
         <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-y-auto space-y-1 text-slate-300 min-h-[300px]">
-          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine v4.5 Ready.</div>
+          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine v4.6 Ready.</div>
+          <div class="text-emerald-400">[MODULE] Multi-Language Core Initialized (Python, Lua, Java, Shell, HTML/JS/CSS).</div>
         </div>
       </section>
 
@@ -893,6 +885,55 @@
         language: 'html',
         content: ``
       }
+    };
+
+    // Helper Buttons Map Based on Language
+    const helperToolbars = {
+      'html': `
+        <button onclick="insertSnippetToEditor('<h1>Title Header</h1>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;h1&gt;</button>
+        <button onclick="insertSnippetToEditor('<p>Paragraph text description...</p>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;p&gt;</button>
+        <button onclick="insertSnippetToEditor('<button class=\\'btn\\'>Click Me</button>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;button&gt;</button>
+        <button onclick="insertSnippetToEditor('<input type=\\'text\\' placeholder=\\'Enter value...\\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;input&gt;</button>
+        <button onclick="insertSnippetToEditor('<img src=\\'https://placehold.co/300x200/1e293b/white?text=Sample+Image\\' alt=\\'Image\\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;img&gt;</button>
+        <button onclick="insertSnippetToEditor('<div class=\\'container\\'>\\n  \\n</div>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;div&gt;</button>
+      `,
+      'javascript': `
+        <button onclick="insertSnippetToEditor('console.log(\\'Debug info:\\', data);')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">console.log()</button>
+        <button onclick="insertSnippetToEditor('document.querySelector(\\'#id\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">querySelector</button>
+        <button onclick="insertSnippetToEditor('fetch(\\'https://api.example.com/data\\')\\n  .then(res => res.json())\\n  .then(data => console.log(data));')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">fetch()</button>
+        <button onclick="insertSnippetToEditor('const myFunction = async () => {\\n  \\n};')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">async () =></button>
+      `,
+      'css': `
+        <button onclick="insertSnippetToEditor('.flex-center {\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">.flex-center</button>
+        <button onclick="insertSnippetToEditor('@media (max-width: 768px) {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">@media mobile</button>
+      `,
+      'python': `
+        <button onclick="insertSnippetToEditor('print(\\'Hello World\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">print()</button>
+        <button onclick="insertSnippetToEditor('def my_function():\\n    pass')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">def func()</button>
+        <button onclick="insertSnippetToEditor('if __name__ == \\'__main__\\':\\n    ')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">if __main__</button>
+        <button onclick="insertSnippetToEditor('import sys\\nimport os')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">import sys</button>
+      `,
+      'lua': `
+        <button onclick="insertSnippetToEditor('print(\\'Hello Lua\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">print()</button>
+        <button onclick="insertSnippetToEditor('local function myFunc()\\n  \\nend')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">local function</button>
+        <button onclick="insertSnippetToEditor('for i=1, 10 do\\n  print(i)\\nend')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">for loop</button>
+      `,
+      'java': `
+        <button onclick="insertSnippetToEditor('System.out.println(\\'Hello Java\\');')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">sout</button>
+        <button onclick="insertSnippetToEditor('public static void main(String[] args) {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">psvm</button>
+        <button onclick="insertSnippetToEditor('public class Main {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">public class</button>
+      `,
+      'cpp': `
+        <button onclick="insertSnippetToEditor('std::cout << \\'Hello C++\\' << std::endl;')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">std::cout</button>
+        <button onclick="insertSnippetToEditor('#include <iostream>\\n#include <vector>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">#include</button>
+        <button onclick="insertSnippetToEditor('int main() {\\n  return 0;\\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">int main()</button>
+      `,
+      'shell': `
+        <button onclick="insertSnippetToEditor('echo \\'Hello Linux\\'')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">echo</button>
+        <button onclick="insertSnippetToEditor('#!/bin/bash\\n')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">#!/bin/bash</button>
+        <button onclick="insertSnippetToEditor('chmod +x script.sh')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">chmod +x</button>
+        <button onclick="insertSnippetToEditor('ls -la')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">ls -la</button>
+      `
     };
 
     // Framework Catalog
@@ -1038,7 +1079,25 @@
       checkEmptyWorkspaceStatus();
       setupFrameMessageListener();
       refreshLivePreview();
+      updateHelperToolbar('html');
     };
+
+    // UPDATE HELPER TOOLBAR BASED ON LANGUAGE
+    function updateHelperToolbar(lang) {
+      const container = document.getElementById('dynamic-helper-toolbar');
+      if (!container) return;
+      container.innerHTML = helperToolbars[lang] || helperToolbars['javascript'];
+    }
+
+    // CHANGE FILE LANGUAGE (Dropdown)
+    function changeActiveFileLanguage(lang) {
+      if (workspaceFiles[activeFileKey]) {
+        workspaceFiles[activeFileKey].language = lang;
+        if (monacoEditor) monaco.editor.setModelLanguage(monacoEditor.getModel(), lang);
+        document.getElementById('active-lang-badge').innerText = lang.toUpperCase();
+        updateHelperToolbar(lang);
+      }
+    }
 
     // VIEW SWITCHING ENGINE
     function switchView(viewId) {
@@ -1116,7 +1175,7 @@
       const codeToRender = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
       
       if (!codeToRender.trim()) {
-        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add code or generate an app to preview live.</p></body></html>`;
+        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add HTML/JS/CSS code to preview live.</p></body></html>`;
         return;
       }
 
@@ -1566,13 +1625,21 @@
     function setActiveFile(key) {
       activeFileKey = key;
       renderFileTabs();
-      if (monacoEditor && workspaceFiles[key]) {
-        monacoEditor.setValue(workspaceFiles[key].content);
-        monaco.editor.setModelLanguage(monacoEditor.getModel(), workspaceFiles[key].language);
+      
+      const fileData = workspaceFiles[key];
+      if (monacoEditor && fileData) {
+        monacoEditor.setValue(fileData.content);
+        monaco.editor.setModelLanguage(monacoEditor.getModel(), fileData.language);
       }
-      document.getElementById('active-lang-badge').innerText = workspaceFiles[key].language.toUpperCase();
+      
+      document.getElementById('active-lang-badge').innerText = fileData.language.toUpperCase();
+      
+      const langSelect = document.getElementById('editor-lang-select');
+      if(langSelect) langSelect.value = fileData.language;
+
       updateCharCount();
       checkEmptyWorkspaceStatus();
+      updateHelperToolbar(fileData.language);
     }
 
     function checkEmptyWorkspaceStatus() {
@@ -1595,11 +1662,18 @@
     }
 
     function createNewFilePrompt() {
-      const name = prompt("Enter file name (e.g., script.js, style.css):");
+      const name = prompt("Enter file name (e.g., script.js, style.css, main.py, app.lua, Main.java):");
       if (!name) return;
+      
       let lang = 'javascript';
       if (name.endsWith('.html')) lang = 'html';
       else if (name.endsWith('.css')) lang = 'css';
+      else if (name.endsWith('.py')) lang = 'python';
+      else if (name.endsWith('.lua')) lang = 'lua';
+      else if (name.endsWith('.java')) lang = 'java';
+      else if (name.endsWith('.cpp')) lang = 'cpp';
+      else if (name.endsWith('.sh')) lang = 'shell';
+
       workspaceFiles[name] = { name, language: lang, content: '' };
       setActiveFile(name);
     }
@@ -1620,9 +1694,20 @@
 
     function loadTestTemplate() {
       const sampleCode = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>DevDeploy Sample Test</title>\n  <script src="https://cdn.tailwindcss.com"><\/script>\n</head>\n<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">\n  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">\n    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mx-auto text-xl">\n      ⚡\n    </div>\n    <h1 class="text-xl font-bold text-purple-400">DevDeploy Studio ULTRA</h1>\n    <p class="text-xs text-slate-400">Sample test application code loaded successfully into the editor.</p>\n    <button onclick="alert('Interactive Test Triggered!')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition">\n      Test Interactive Click\n    </button>\n  </div>\n</body>\n</html>`;
-      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: sampleCode };
+      
+      let lang = document.getElementById('editor-lang-select').value;
+      if (lang === 'python') {
+        workspaceFiles[activeFileKey].content = `def greet():\n    print("Welcome to DevDeploy ULTRA Python Engine!")\n\nif __name__ == '__main__':\n    greet()`;
+      } else if (lang === 'lua') {
+        workspaceFiles[activeFileKey].content = `local function greet()\n    print("Welcome to DevDeploy ULTRA Lua Engine!")\nend\n\ngreet()`;
+      } else if (lang === 'java') {
+        workspaceFiles[activeFileKey].content = `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to DevDeploy ULTRA Java Engine!");\n    }\n}`;
+      } else {
+        workspaceFiles[activeFileKey].content = sampleCode;
+      }
+      
+      if (monacoEditor) monacoEditor.setValue(workspaceFiles[activeFileKey].content);
       switchView('editor');
-      setActiveFile('index.html');
       showToast("Sample test template loaded into editor!", "success");
       logTerminal('SUCCESS', 'Loaded Sample Test Template into workspace.');
     }
