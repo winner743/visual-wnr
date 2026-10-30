@@ -3,8 +3,8 @@
 <html lang="en" class="dark h-full bg-slate-950">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DevDeploy Studio PRO - Modern Cloud IDE & Deployer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DevDeploy Studio ULTRA - Code IDE, Merger & Tag Helper</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,9 +19,10 @@
               github: '#2ea44f',
               netlify: '#00c7b7',
               accent: '#3b82f6',
-              purple: '#8b5cf6',
+              purple: '#a855f7',
+              emerald: '#10b981',
               darkBg: '#030712',
-              panelBg: '#0f172a',
+              panelBg: '#0b1120',
               borderBg: '#1e293b'
             }
           },
@@ -46,8 +47,8 @@
   <style>
     /* Custom Smooth Scrollbar */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #030712;
@@ -62,7 +63,7 @@
 
     /* Glassmorphic Panel Styles */
     .glass-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(11, 17, 32, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -70,7 +71,7 @@
 
     /* Tab Transition Animations */
     .view-panel {
-      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       will-change: opacity, transform;
     }
 
@@ -84,48 +85,72 @@
     .view-panel.inactive {
       display: none !important;
       opacity: 0;
-      transform: translateY(12px) scale(0.98);
+      transform: translateY(8px) scale(0.99);
       pointer-events: none;
     }
 
-    /* Neon Accent Glow Effects */
-    .glow-blue {
-      box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.25);
+    /* Preview Viewport Dimensions */
+    .preview-desktop { width: 100%; height: 100%; max-width: 100%; }
+    .preview-tablet  { width: 768px; height: 100%; max-width: 100%; margin: 0 auto; border-radius: 12px; }
+    .preview-mobile  { width: 375px; height: 667px; max-width: 100%; margin: 0 auto; border-radius: 16px; }
+
+    /* Custom Toast Notification Animation */
+    @keyframes slideInUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-    .glow-purple {
-      box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.25);
+    .toast-anim {
+      animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Horizontal Helper Button Scrollbar styling */
+    .helper-scroll {
+      scrollbar-width: none;
+    }
+    .helper-scroll::-webkit-scrollbar {
+      display: none;
     }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans h-full overflow-hidden flex flex-col antialiased select-none">
 
   <!-- TOP APP HEADER -->
-  <header class="h-14 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between z-40 shrink-0">
-    <!-- Brand Logo & Version -->
+  <header class="h-14 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-3 md:px-4 flex items-center justify-between z-40 shrink-0">
+    <!-- Brand Logo & Tag -->
     <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
         <i data-lucide="code-2" class="w-5 h-5"></i>
       </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-blue-500">PRO</span></span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">v3.0 ULTRA</span>
-        </div>
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-purple-400">ULTRA</span></span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.0</span>
       </div>
     </div>
 
-    <!-- Active View Indicator / Quick Actions -->
-    <div class="flex items-center space-x-2">
-      <!-- Quick Load Test Template Header Button -->
+    <!-- Top Quick Action Buttons -->
+    <div class="flex items-center space-x-1.5 md:space-x-2">
+      <!-- Helper Drawer Trigger -->
+      <button onclick="toggleHelperDrawer()" class="px-2.5 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
+        <i data-lucide="code" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Tag Cheat Sheet</span>
+      </button>
+
+      <!-- Load Test Code -->
       <button onclick="loadTestTemplate()" class="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
         <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Load Test Template</span>
+        <span class="hidden sm:inline">Load Sample</span>
+      </button>
+
+      <!-- Live Preview Button -->
+      <button onclick="switchView('preview')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
+        <i data-lucide="play" class="w-3.5 h-3.5"></i>
+        <span>Preview</span>
       </button>
 
       <!-- Deploy Quick Trigger -->
-      <button onclick="switchView('deploy')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-xs rounded-lg flex items-center space-x-1.5 shadow-md shadow-blue-600/20 transition">
+      <button onclick="switchView('deploy')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium text-xs rounded-lg flex items-center space-x-1.5 shadow-md shadow-blue-600/20 transition">
         <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
-        <span>Deploy</span>
+        <span class="hidden sm:inline">Deploy</span>
       </button>
     </div>
   </header>
@@ -134,30 +159,41 @@
   <div class="flex flex-1 overflow-hidden relative">
 
     <!-- DESKTOP SIDEBAR NAVIGATION -->
-    <aside class="hidden md:flex w-56 bg-slate-900/60 border-r border-slate-800/80 flex-col justify-between shrink-0">
+    <aside class="hidden md:flex w-60 bg-slate-900/70 border-r border-slate-800/80 flex-col justify-between shrink-0">
       <div class="p-3 space-y-1">
         
-        <button onclick="switchView('editor')" id="nav-desktop-editor" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all text-blue-400 bg-blue-500/10 border border-blue-500/20">
+        <button onclick="switchView('editor')" id="nav-desktop-editor" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-blue-400 bg-blue-500/10 border border-blue-500/20">
           <i data-lucide="file-code" class="w-4 h-4 shrink-0"></i>
           <span>Code Editor</span>
         </button>
 
-        <button onclick="switchView('templates')" id="nav-desktop-templates" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+        <button onclick="switchView('merger')" id="nav-desktop-merger" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="combine" class="w-4 h-4 text-purple-400 shrink-0"></i>
+          <span>3-Script Merger</span>
+          <span class="ml-auto text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-mono font-semibold">3-IN-1</span>
+        </button>
+
+        <button onclick="switchView('preview')" id="nav-desktop-preview" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+          <i data-lucide="play-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+          <span>Live Preview</span>
+        </button>
+
+        <button onclick="switchView('templates')" id="nav-desktop-templates" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="boxes" class="w-4 h-4 shrink-0"></i>
           <span>Brand Templates</span>
         </button>
 
-        <button onclick="switchView('deploy')" id="nav-desktop-deploy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+        <button onclick="switchView('deploy')" id="nav-desktop-deploy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="cloud-lightning" class="w-4 h-4 shrink-0"></i>
           <span>Deploy & Tokens</span>
         </button>
 
-        <button onclick="switchView('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+        <button onclick="switchView('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="sparkles" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>AI Helper & English</span>
+          <span>AI Script Helper</span>
         </button>
 
-        <button onclick="switchView('logs')" id="nav-desktop-logs" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+        <button onclick="switchView('logs')" id="nav-desktop-logs" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
           <i data-lucide="terminal" class="w-4 h-4 shrink-0"></i>
           <span>Terminal Logs</span>
         </button>
@@ -166,29 +202,29 @@
 
       <!-- Footer Info Badge -->
       <div class="p-3 border-t border-slate-800/80">
-        <div class="bg-slate-950/60 rounded-lg p-2.5 border border-slate-800/80 text-[11px] space-y-1">
+        <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80 text-[11px] space-y-1.5">
           <div class="flex items-center justify-between text-slate-400">
             <span>Editor Engine:</span>
             <span class="text-emerald-400 font-mono">Monaco JS</span>
           </div>
           <div class="flex items-center justify-between text-slate-400">
-            <span>Active Target:</span>
-            <span id="sidebar-target-name" class="text-blue-400 font-mono">Vercel</span>
+            <span>Target Cloud:</span>
+            <span id="sidebar-target-name" class="text-purple-400 font-mono font-bold">VERCEL</span>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- CONTENT VIEWS CONTAINER -->
+    <!-- MAIN CONTENT VIEWS CONTAINER -->
     <main class="flex-1 bg-slate-950 relative overflow-hidden flex flex-col">
 
       <!-- ========================================== -->
-      <!-- VIEW 1: DEDICATED FULL EDITOR WORKSPACE    -->
+      <!-- VIEW 1: DEDICATED FULL CODE EDITOR         -->
       <!-- ========================================== -->
-      <section id="view-editor" class="view-panel active h-full flex-col flex-1 p-3 md:p-4 space-y-3">
+      <section id="view-editor" class="view-panel active h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4 overflow-y-auto">
         
         <!-- Editor Header Toolbar -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0">
+        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0 gap-2">
           
           <!-- File Tabs Bar -->
           <div id="file-tabs-bar" class="flex items-center space-x-1.5 overflow-x-auto pr-2">
@@ -196,12 +232,12 @@
           </div>
 
           <!-- Actions Bar -->
-          <div class="flex items-center space-x-2 shrink-0">
+          <div class="flex items-center space-x-1.5 shrink-0">
             <button onclick="createNewFilePrompt()" title="Add File" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition">
               <i data-lucide="file-plus" class="w-4 h-4"></i>
             </button>
 
-            <button onclick="clearWorkspace()" title="Clear Workspace" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-lg transition">
+            <button onclick="clearWorkspace()" title="Clear Active File" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-lg transition">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
 
@@ -212,36 +248,74 @@
           </div>
         </div>
 
+        <!-- QUICK SCRIPT TAG HELPER BAR (EDITOR) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2 flex items-center space-x-2 shrink-0">
+          <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 shrink-0 flex items-center space-x-1">
+            <i data-lucide="zap" class="w-3 h-3"></i>
+            <span>Quick Helper</span>
+          </span>
+
+          <div class="flex items-center space-x-1.5 overflow-x-auto helper-scroll py-0.5">
+            <button onclick="insertSnippetToEditor('<h1>Title Header</h1>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;h1&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('<p>Paragraph text description...</p>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;p&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('<button class=\'btn\'>Click Me</button>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;button&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('<input type=\'text\' placeholder=\'Enter value...\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;input&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('<img src=\'https://placehold.co/300x200/1e293b/white?text=Sample+Image\' alt=\'Image\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;img&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('<div class=\'container\'>\n  \n</div>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              &lt;div&gt;
+            </button>
+            <button onclick="insertSnippetToEditor('fetch(\'https://api.example.com/data\')\n  .then(res => res.json())\n  .then(data => console.log(data));')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              fetch()
+            </button>
+            <button onclick="insertSnippetToEditor('console.log(\'Debug info:\', data);')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">
+              console.log
+            </button>
+          </div>
+        </div>
+
         <!-- Editor Container Area -->
-        <div class="flex-1 glass-card rounded-xl border border-slate-800/80 overflow-hidden relative flex flex-col">
+        <div class="flex-1 glass-card rounded-xl border border-slate-800/80 overflow-hidden relative flex flex-col min-h-[350px]">
           
-          <!-- Empty Workspace Prompt Overlay -->
-          <div id="empty-workspace-banner" class="absolute inset-0 bg-slate-950/90 z-20 flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+          <!-- Empty Workspace Overlay Banner -->
+          <div id="empty-workspace-banner" class="absolute inset-0 bg-slate-950/95 z-20 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <i data-lucide="file-code-2" class="w-6 h-6"></i>
             </div>
             <div class="max-w-md space-y-1">
-              <h3 class="font-bold text-base text-slate-200">Editor Workspace is Blank</h3>
-              <p class="text-xs text-slate-400">Start typing code directly or click below to load a ready-to-test sample script.</p>
+              <h3 class="font-bold text-base text-slate-200">Workspace is Clean & Blank</h3>
+              <p class="text-xs text-slate-400">Start typing code, tap quick helper tags, or use the 3-script merger to build your app.</p>
             </div>
-            <div class="flex flex-wrap items-center justify-center gap-2">
-              <button onclick="loadTestTemplate()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-blue-500/20 transition">
-                🚀 Load Sample Test Template
+            <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <button onclick="loadTestTemplate()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition">
+                🚀 Load Sample Test Code
               </button>
-              <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition">
-                Start From Scratch
+              <button onclick="switchView('merger')" class="px-4 py-2 bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-600/30 text-xs font-medium rounded-xl transition">
+                ⚡ Open 3-Script Merger
+              </button>
+              <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
+                Start From Blank
               </button>
             </div>
           </div>
 
           <!-- Monaco Editor Frame -->
-          <div id="monaco-container" class="w-full h-full bg-[#1e1e1e]"></div>
+          <div id="monaco-container" class="w-full h-full bg-[#1e1e1e] flex-1"></div>
         </div>
 
         <!-- Editor Footer Status Bar -->
         <div class="bg-slate-900/90 border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-400 font-mono shrink-0">
           <div class="flex items-center space-x-3">
-            <span id="active-lang-badge" class="text-blue-400">HTML</span>
+            <span id="active-lang-badge" class="text-purple-400 font-bold">HTML</span>
             <span>UTF-8</span>
           </div>
           <div class="flex items-center space-x-3">
@@ -252,35 +326,198 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 2: SCRIPT & BRAND TEMPLATES LIBRARY   -->
+      <!-- VIEW 2: MULTI-SCRIPT MERGER (3-IN-1)       -->
       <!-- ========================================== -->
-      <section id="view-templates" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
+      <section id="view-merger" class="view-panel inactive h-full flex-col flex-1 p-3 md:p-6 overflow-y-auto space-y-5 pb-32 md:pb-6">
         
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div>
-            <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
-              <i data-lucide="boxes" class="w-5 h-5 text-blue-400"></i>
-              <span>Brand Script & Framework Templates</span>
+            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
+              <i data-lucide="combine" class="w-5 h-5 text-purple-400"></i>
+              <span>Multi-Script Merger & Tag Helper</span>
             </h1>
-            <p class="text-xs text-slate-400">Choose a framework starter or custom script template to load into your editor.</p>
+            <p class="text-xs text-slate-400">Paste or upload up to 3 scripts (HTML, CSS, JS). Use the helper bars on each slot to insert tags easily.</p>
+          </div>
+
+          <button onclick="loadSampleMergerScripts()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium flex items-center space-x-1.5 transition">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Load 3-Script Sample</span>
+          </button>
+        </div>
+
+        <!-- 3 Script Input Cards Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          
+          <!-- SCRIPT 1 SLOT (HTML) -->
+          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-400 flex items-center space-x-1.5">
+                <span class="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px]">1</span>
+                <span>Script 1 (HTML / Base)</span>
+              </span>
+              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-blue-400 flex items-center space-x-1">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span>Upload File</span>
+                <input type="file" accept=".html,.txt,.js" class="hidden" onchange="handleScriptFileUpload(event, 'script1')" />
+              </label>
+            </div>
+
+            <!-- HTML Slot Tag Helper Toolbar -->
+            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
+              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
+              <button onclick="appendToSlot('merger-script1', '<h1>Heading Text</h1>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;h1&gt;</button>
+              <button onclick="appendToSlot('merger-script1', '<p>Paragraph description text...</p>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;p&gt;</button>
+              <button onclick="appendToSlot('merger-script1', '<button class=\'btn\'>Click Me</button>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;button&gt;</button>
+              <button onclick="appendToSlot('merger-script1', '<input type=\'text\' placeholder=\'Enter text...\' />\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;input&gt;</button>
+              <button onclick="appendToSlot('merger-script1', '<img src=\'https://placehold.co/300x200/1e293b/white?text=Image\' alt=\'Image\' />\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;img&gt;</button>
+            </div>
+
+            <textarea id="merger-script1" rows="10" placeholder="<!-- Paste HTML Structure or Tag Script 1 here -->" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-blue-500 resize-none flex-1"></textarea>
+          </div>
+
+          <!-- SCRIPT 2 SLOT (CSS) -->
+          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-400 flex items-center space-x-1.5">
+                <span class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[10px]">2</span>
+                <span>Script 2 (CSS / Styling)</span>
+              </span>
+              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-purple-400 flex items-center space-x-1">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span>Upload File</span>
+                <input type="file" accept=".css,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script2')" />
+              </label>
+            </div>
+
+            <!-- CSS Slot Tag Helper Toolbar -->
+            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
+              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
+              <button onclick="appendToSlot('merger-script2', '.container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">.flex-center</button>
+              <button onclick="appendToSlot('merger-script2', '.btn {\n  padding: 8px 16px;\n  background: #3b82f6;\n  color: #fff;\n  border-radius: 8px;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">.btn-style</button>
+              <button onclick="appendToSlot('merger-script2', 'body {\n  background-color: #030712;\n  color: #f8fafc;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">body-theme</button>
+            </div>
+
+            <textarea id="merger-script2" rows="10" placeholder="/* Paste CSS Styling or Script 2 here */" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-purple-500 resize-none flex-1"></textarea>
+          </div>
+
+          <!-- SCRIPT 3 SLOT (JS) -->
+          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">3</span>
+                <span>Script 3 (JS / Logic)</span>
+              </span>
+              <label class="cursor-pointer text-[11px] text-slate-400 hover:text-emerald-400 flex items-center space-x-1">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span>Upload File</span>
+                <input type="file" accept=".js,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script3')" />
+              </label>
+            </div>
+
+            <!-- JS Slot Tag Helper Toolbar -->
+            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
+              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
+              <button onclick="appendToSlot('merger-script3', 'document.addEventListener(\'DOMContentLoaded\', () => {\n  console.log(\'Loaded!\');\n});\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">onLoad</button>
+              <button onclick="appendToSlot('merger-script3', 'fetch(\'https://api.example.com/data\')\n  .then(res => res.json())\n  .then(data => console.log(data));\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">fetch()</button>
+              <button onclick="appendToSlot('merger-script3', 'document.querySelector(\'.btn\').addEventListener(\'click\', () => {\n  alert(\'Clicked!\');\n});\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">onClick</button>
+            </div>
+
+            <textarea id="merger-script3" rows="10" placeholder="// Paste JavaScript Logic or Script 3 here" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-emerald-500 resize-none flex-1"></textarea>
+          </div>
+
+        </div>
+
+        <!-- Action Card: Merge Engine Trigger -->
+        <div class="glass-card p-5 rounded-2xl border border-purple-500/30 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+          <div class="space-y-1 text-center md:text-left">
+            <h3 class="text-sm font-bold text-white flex items-center justify-center md:justify-start space-x-2">
+              <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i>
+              <span>Bundle & Merge 3 Scripts</span>
+            </h3>
+            <p class="text-xs text-slate-400">Combines Script 1 (HTML), Script 2 (CSS), and Script 3 (JS) into one clean file and loads it into Editor & Live Preview.</p>
           </div>
 
           <div class="flex items-center space-x-2 w-full md:w-auto">
-            <input type="text" id="template-search-input" onkeyup="filterTemplates()" placeholder="Search templates..." class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-full md:w-56" />
-            
-            <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-2 rounded-lg font-medium flex items-center space-x-1.5 shrink-0 transition">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Add Custom</span>
+            <button onclick="clearMergerSlots()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
+              Clear Slots
+            </button>
+            <button onclick="executeScriptBundle()" class="px-6 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-500/25 flex items-center justify-center space-x-2 transition w-full md:w-auto shrink-0">
+              <i data-lucide="combine" class="w-4 h-4"></i>
+              <span>Bundle & Push to Editor</span>
             </button>
           </div>
         </div>
 
-        <!-- Filter Badges -->
-        <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
-          <button onclick="filterCategory('all')" class="cat-pill px-3 py-1 rounded-full bg-blue-600 text-white font-medium">All Frameworks</button>
-          <button onclick="filterCategory('frontend')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Frontend</button>
-          <button onclick="filterCategory('backend')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Backend API</button>
-          <button onclick="filterCategory('fullstack')" class="cat-pill px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200">Fullstack</button>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 3: LIVE INTERACTIVE PREVIEW           -->
+      <!-- ========================================== -->
+      <section id="view-preview" class="view-panel inactive h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4">
+        
+        <!-- Preview Controls Toolbar -->
+        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0">
+          
+          <!-- Viewport Mode Switcher -->
+          <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+            <button onclick="setPreviewViewport('desktop')" id="vp-btn-desktop" class="px-2.5 py-1 rounded-md bg-blue-600 text-white font-medium flex items-center space-x-1 transition">
+              <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Desktop</span>
+            </button>
+            <button onclick="setPreviewViewport('tablet')" id="vp-btn-tablet" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition">
+              <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Tablet</span>
+            </button>
+            <button onclick="setPreviewViewport('mobile')" id="vp-btn-mobile" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition">
+              <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Mobile</span>
+            </button>
+          </div>
+
+          <!-- Status Address Pill -->
+          <div class="hidden md:flex items-center space-x-2 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1 text-xs text-slate-400 font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>https://preview.devdeploy.local</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center space-x-1.5">
+            <button onclick="refreshLivePreview()" title="Refresh Preview" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">
+              <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            </button>
+
+            <button onclick="openPreviewNewTab()" title="Open in New Window" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center space-x-1 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Pop Out</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Interactive Frame Wrapper -->
+        <div class="flex-1 bg-slate-950/80 rounded-xl border border-slate-800/80 p-1.5 overflow-hidden flex items-center justify-center relative min-h-[350px]">
+          <iframe id="interactive-preview-frame" class="preview-desktop bg-white border-0 transition-all duration-300 shadow-2xl rounded-lg" sandbox="allow-scripts allow-modals"></iframe>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: BRAND TEMPLATES LIBRARY            -->
+      <!-- ========================================== -->
+      <section id="view-templates" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 pb-28 md:pb-6">
+        
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
+              <i data-lucide="boxes" class="w-5 h-5 text-blue-400"></i>
+              <span>Brand Framework Templates</span>
+            </h1>
+            <p class="text-xs text-slate-400">Select a framework starter template to populate your editor workspace.</p>
+          </div>
+
+          <div class="flex items-center space-x-2 w-full md:w-auto">
+            <input type="text" id="template-search-input" onkeyup="filterTemplates()" placeholder="Search templates..." class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-full md:w-56" />
+          </div>
         </div>
 
         <!-- Template Cards Grid -->
@@ -290,24 +527,24 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 3: DEPLOYMENT HUB & TOKEN SETTINGS    -->
+      <!-- VIEW 5: DEPLOYMENT HUB & TOKEN SETTINGS    -->
       <!-- ========================================== -->
-      <section id="view-deploy" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-5xl mx-auto w-full">
+      <section id="view-deploy" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-5xl mx-auto w-full pb-28 md:pb-6">
         
         <div>
-          <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
-            <i data-lucide="cloud-lightning" class="w-5 h-5 text-blue-400"></i>
+          <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
+            <i data-lucide="cloud-lightning" class="w-5 h-5 text-purple-400"></i>
             <span>Cloud Deployment Hub</span>
           </h1>
-          <p class="text-xs text-slate-400">Configure deployment targets, saved API credentials, and execute cloud triggers.</p>
+          <p class="text-xs text-slate-400">Configure cloud providers, save bearer API tokens, and execute live web deployments.</p>
         </div>
 
-        <!-- Deployment Target Selection Tabs -->
-        <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
-          <label class="block text-xs font-semibold text-slate-300">Choose Target Cloud Provider</label>
+        <!-- Deployment Target Cards -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+          <label class="block text-xs font-semibold text-slate-300">Target Provider</label>
           <div class="grid grid-cols-3 gap-3">
             
-            <button onclick="setDeployTarget('vercel')" id="target-card-vercel" class="target-card p-4 rounded-xl border border-blue-500 bg-blue-500/10 flex flex-col items-center justify-center space-y-2 text-white transition">
+            <button onclick="setDeployTarget('vercel')" id="target-card-vercel" class="target-card p-4 rounded-xl border border-purple-500 bg-purple-500/10 flex flex-col items-center justify-center space-y-2 text-white transition">
               <i data-lucide="triangle" class="w-6 h-6 fill-current"></i>
               <span class="text-xs font-bold">Vercel</span>
             </button>
@@ -325,144 +562,132 @@
           </div>
         </div>
 
-        <!-- Project Deploy Settings & API Credentials Grid -->
+        <!-- Configuration Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          <!-- Column 1: Repository Settings -->
-          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
-            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Project Configurations</h3>
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Project Settings</h3>
             
             <div>
-              <label class="block text-xs text-slate-400 mb-1">Project / Repository Name</label>
-              <input type="text" id="deploy-proj-name" value="my-awesome-app" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+              <label class="block text-xs text-slate-400 mb-1">Project Name</label>
+              <input type="text" id="deploy-proj-name" value="my-awesome-app" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
             </div>
 
             <div>
               <label class="block text-xs text-slate-400 mb-1">Access Visibility</label>
-              <select id="deploy-visibility" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
-                <option value="public">Public Repository / Site</option>
-                <option value="private">Private Access</option>
+              <select id="deploy-visibility" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500">
+                <option value="public">Public Site</option>
+                <option value="private">Private Site</option>
               </select>
-            </div>
-
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">Build Command (Optional)</label>
-              <input type="text" value="npm run build" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
             </div>
           </div>
 
-          <!-- Column 2: Saved API Credentials -->
-          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
-            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">API Bearer / PAT Credentials</h3>
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Saved API Tokens</h3>
 
-            <!-- GitHub Token -->
             <div class="space-y-1">
               <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>GitHub Personal Access Token</span>
+                <span>GitHub Access Token</span>
                 <span id="badge-token-github" class="text-[10px] text-amber-400">Unset</span>
               </label>
-              <input type="password" id="input-token-github" placeholder="ghp_xxxxxxxxxxxxxxxx" onchange="saveToken('github')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+              <input type="password" id="input-token-github" placeholder="ghp_xxxxxxxxxxxxxxxx" onchange="saveToken('github')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
             </div>
 
-            <!-- Vercel Token -->
             <div class="space-y-1">
               <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>Vercel API Bearer Token</span>
+                <span>Vercel Bearer Token</span>
                 <span id="badge-token-vercel" class="text-[10px] text-amber-400">Unset</span>
               </label>
-              <input type="password" id="input-token-vercel" placeholder="Bearer Token..." onchange="saveToken('vercel')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+              <input type="password" id="input-token-vercel" placeholder="Bearer Token..." onchange="saveToken('vercel')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
             </div>
 
-            <!-- Netlify Token -->
             <div class="space-y-1">
               <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>Netlify Personal Token</span>
+                <span>Netlify Token</span>
                 <span id="badge-token-netlify" class="text-[10px] text-amber-400">Unset</span>
               </label>
-              <input type="password" id="input-token-netlify" placeholder="nfp_xxxxxxxxxxxxxxxx" onchange="saveToken('netlify')" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500" />
+              <input type="password" id="input-token-netlify" placeholder="nfp_xxxxxxxxxxxxxxxx" onchange="saveToken('netlify')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
             </div>
           </div>
 
         </div>
 
-        <!-- Trigger Deploy Action Card -->
-        <div class="glass-card p-6 rounded-xl border border-blue-500/30 flex flex-col items-center text-center space-y-4">
+        <!-- Deploy Trigger Button -->
+        <div class="glass-card p-6 rounded-2xl border border-purple-500/30 flex flex-col items-center text-center space-y-4">
           <div class="space-y-1">
-            <h2 class="text-base font-bold text-white">Ready to Deploy Workspace</h2>
-            <p class="text-xs text-slate-400">This will package active files and trigger deployment to <span id="target-display-label" class="text-blue-400 font-bold">Vercel</span>.</p>
+            <h2 class="text-base font-bold text-white">Execute Deployment</h2>
+            <p class="text-xs text-slate-400">Packages code from workspace and triggers live deployment on <span id="target-display-label" class="text-purple-400 font-bold">VERCEL</span>.</p>
           </div>
 
-          <button onclick="triggerDeployment()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-blue-500/25 flex items-center justify-center space-x-2 transition">
+          <button onclick="triggerDeployment()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-purple-500/25 flex items-center justify-center space-x-2 transition">
             <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-            <span>Execute Cloud Deployment</span>
+            <span>Start Cloud Build & Deploy</span>
           </button>
         </div>
 
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 4: AI SCRIPT & ENGLISH HELPER         -->
+      <!-- VIEW 6: AI TECHNICAL ENGLISH & SCRIPT HELPER -->
       <!-- ========================================== -->
-      <section id="view-ai" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6">
+      <section id="view-ai" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 pb-28 md:pb-6">
         
         <div>
-          <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+          <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
             <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
             <span>AI Technical English & Script Helper</span>
           </h1>
-          <p class="text-xs text-slate-400">Refine comments, variable names, and documentation into fluent technical English using Gemini AI.</p>
+          <p class="text-xs text-slate-400">Translate comments, variable names, and documentation into fluent technical English using Gemini AI.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          <!-- Input Area -->
-          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col">
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-slate-300">Source Input Code / Text</label>
+              <label class="text-xs font-semibold text-slate-300">Input Text / Code</label>
               <button onclick="importActiveFileToAI()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
                 <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
-                <span>Load Active Editor Code</span>
+                <span>Load from Editor</span>
               </button>
             </div>
 
-            <textarea id="ai-input-box" rows="12" placeholder="Paste code or rough notes here..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
+            <textarea id="ai-input-box" rows="10" placeholder="Paste code or text to optimize..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
 
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="runAIOptimizer('english')" class="py-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+              <button onclick="runAIOptimizer('english')" class="py-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="languages" class="w-3.5 h-3.5"></i>
                 <span>Polish English</span>
               </button>
-              <button onclick="runAIOptimizer('readme')" class="py-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+              <button onclick="runAIOptimizer('readme')" class="py-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                <span>Build README</span>
+                <span>README</span>
               </button>
-              <button onclick="runAIOptimizer('refactor')" class="py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-xs rounded-lg font-medium flex items-center justify-center space-x-1 transition">
+              <button onclick="runAIOptimizer('refactor')" class="py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
                 <i data-lucide="code" class="w-3.5 h-3.5"></i>
                 <span>Refactor</span>
               </button>
             </div>
           </div>
 
-          <!-- Output Result Area -->
-          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col">
+          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
             <div class="flex items-center justify-between">
               <label class="text-xs font-semibold text-amber-400 flex items-center space-x-1">
                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>AI Refined Output</span>
+                <span>AI Output Result</span>
               </label>
               
               <div class="flex items-center space-x-2">
-                <button onclick="copyAIOutput()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-md transition">
+                <button onclick="copyAIOutput()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition">
                   Copy
                 </button>
-                <button onclick="applyAIToActiveFile()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-md transition">
-                  Apply to Editor
+                <button onclick="applyAIToActiveFile()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg transition">
+                  Push to Editor
                 </button>
               </div>
             </div>
 
-            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[250px] whitespace-pre-wrap">
-              <span class="text-slate-600 italic">Enhanced result will appear here...</span>
+            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[220px] whitespace-pre-wrap">
+              <span class="text-slate-600 italic">Optimized result will appear here...</span>
             </div>
           </div>
 
@@ -470,32 +695,32 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- VIEW 5: FULLSCREEN TERMINAL & LOGS         -->
+      <!-- VIEW 7: TERMINAL CONSOLE & LOGS            -->
       <!-- ========================================== -->
-      <section id="view-logs" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 space-y-4">
+      <section id="view-logs" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 space-y-4 pb-28 md:pb-6">
         
         <div class="flex items-center justify-between shrink-0">
           <div>
-            <h1 class="text-lg font-bold text-slate-100 flex items-center space-x-2">
+            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
               <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i>
-              <span>Cloud Build & Deploy Logs</span>
+              <span>Terminal & Build Logs</span>
             </h1>
             <p class="text-xs text-slate-400">Live request tracing, build stderr output, and DNS routing logs.</p>
           </div>
 
           <div class="flex items-center space-x-2">
-            <button onclick="downloadTerminalLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg flex items-center space-x-1">
+            <button onclick="downloadTerminalLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-xl flex items-center space-x-1 transition">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span>Export Log</span>
+              <span>Export</span>
             </button>
-            <button onclick="clearTerminalLogs()" class="px-3 py-1.5 bg-rose-500/10 text-rose-400 text-xs rounded-lg">
-              Clear Console
+            <button onclick="clearTerminalLogs()" class="px-3 py-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs rounded-xl transition">
+              Clear
             </button>
           </div>
         </div>
 
-        <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs overflow-y-auto space-y-1.5 text-slate-300">
-          <div class="text-slate-600">[SYSTEM] DevDeploy Studio Terminal initialized. Log stream ready.</div>
+        <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-y-auto space-y-1 text-slate-300 min-h-[300px]">
+          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine Ready.</div>
         </div>
       </section>
 
@@ -503,112 +728,135 @@
   </div>
 
   <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="md:hidden h-16 border-t border-slate-800/80 bg-slate-900/95 backdrop-blur-md px-2 flex items-center justify-around z-40 shrink-0">
+  <nav class="md:hidden h-16 border-t border-slate-800/80 bg-slate-950/95 backdrop-blur-md px-2 flex items-center justify-around fixed bottom-0 left-0 right-0 z-40 shrink-0">
     
     <button onclick="switchView('editor')" id="nav-mobile-editor" class="flex flex-col items-center justify-center w-12 py-1 text-blue-400">
-      <i data-lucide="file-code" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-1 font-medium">Editor</span>
+      <i data-lucide="file-code" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">Editor</span>
     </button>
 
-    <button onclick="switchView('templates')" id="nav-mobile-templates" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="boxes" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-1 font-medium">Templates</span>
+    <button onclick="switchView('merger')" id="nav-mobile-merger" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="combine" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">Merger</span>
+    </button>
+
+    <button onclick="switchView('preview')" id="nav-mobile-preview" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
+      <i data-lucide="play-circle" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">Preview</span>
     </button>
 
     <button onclick="switchView('deploy')" id="nav-mobile-deploy" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-1 font-medium">Deploy</span>
+      <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">Deploy</span>
     </button>
 
     <button onclick="switchView('ai')" id="nav-mobile-ai" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="sparkles" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-1 font-medium">AI Helper</span>
+      <i data-lucide="sparkles" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">AI</span>
     </button>
 
     <button onclick="switchView('logs')" id="nav-mobile-logs" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="terminal" class="w-5 h-5"></i>
-      <span class="text-[10px] mt-1 font-medium">Logs</span>
+      <i data-lucide="terminal" class="w-4 h-4"></i>
+      <span class="text-[9px] mt-1 font-medium">Logs</span>
     </button>
 
   </nav>
 
-  <!-- MODAL: ADD CUSTOM SCRIPT -->
-  <div id="modal-custom-script" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-card w-full max-w-lg p-6 rounded-2xl border border-slate-800 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+  <!-- DRAWER MODAL: SCRIPT TAG CHEAT SHEET -->
+  <div id="drawer-tag-helper" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-card w-full max-w-2xl max-h-[85vh] p-6 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
         <h3 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
-          <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i>
-          <span>Save Custom Template</span>
+          <i data-lucide="code" class="w-4 h-4 text-purple-400"></i>
+          <span>Script Tag Helper Cheat Sheet</span>
         </h3>
-        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white">
+        <button onclick="toggleHelperDrawer()" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Template Title</label>
-          <input type="text" id="modal-title" placeholder="e.g. My Custom React Component" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500" />
+      <div class="overflow-y-auto space-y-4 flex-1 pr-1 text-xs">
+        
+        <!-- HTML Section -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-blue-400 uppercase tracking-wider text-[11px]">HTML Tags Helper</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <button onclick="insertHelperFromDrawer('<h1>Header 1</h1>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;h1&gt;</div>
+              <div class="text-[10px] text-slate-400">Main title header</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('<p>Text content...</p>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;p&gt;</div>
+              <div class="text-[10px] text-slate-400">Paragraph text tag</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('<button class=\'btn\'>Button</button>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;button&gt;</div>
+              <div class="text-[10px] text-slate-400">Interactive button tag</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('<input type=\'text\' placeholder=\'Input...\' />')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;input&gt;</div>
+              <div class="text-[10px] text-slate-400">Text input field</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('<img src=\'https://placehold.co/300x200/1e293b/white?text=Image\' />')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;img&gt;</div>
+              <div class="text-[10px] text-slate-400">Image element</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('<script src=\'https://cdn.tailwindcss.com\'><\/script>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
+              <div class="font-mono text-blue-300 font-bold">&lt;script CDN&gt;</div>
+              <div class="text-[10px] text-slate-400">Tailwind script tag</div>
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Category</label>
-            <select id="modal-cat" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none">
-              <option value="frontend">Frontend</option>
-              <option value="backend">Backend API</option>
-              <option value="fullstack">Fullstack</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Language</label>
-            <select id="modal-lang" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none">
-              <option value="html">HTML</option>
-              <option value="javascript">JavaScript</option>
-              <option value="typescript">TypeScript</option>
-              <option value="python">Python</option>
-            </select>
+        <!-- JS Section -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">JavaScript Helpers</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button onclick="insertHelperFromDrawer('fetch(\'https://api.example.com/data\').then(r => r.json()).then(console.log);')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-emerald-500 transition">
+              <div class="font-mono text-emerald-300 font-bold">fetch() API</div>
+              <div class="text-[10px] text-slate-400">HTTP REST request fetcher</div>
+            </button>
+            <button onclick="insertHelperFromDrawer('document.querySelector(\'#btn\').addEventListener(\'click\', () => {});')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-emerald-500 transition">
+              <div class="font-mono text-emerald-300 font-bold">addEventListener()</div>
+              <div class="text-[10px] text-slate-400">Event click listener binding</div>
+            </button>
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">Source Code</label>
-          <textarea id="modal-code" rows="6" placeholder="// Enter custom script template code..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 focus:outline-none resize-none"></textarea>
-        </div>
       </div>
 
-      <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
-        <button onclick="closeAddModal()" class="px-3 py-2 text-xs text-slate-400 hover:text-slate-200">Cancel</button>
-        <button onclick="saveCustomTemplate()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg">Save Template</button>
-      </div>
     </div>
   </div>
 
-  <!-- APPLICATION LOGIC & STATE ENGINE -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- APPLICATION ENGINE SCRIPT -->
   <script>
-    // Application State
+    // Global State
     let currentView = 'editor';
     let activeDeployTarget = 'vercel';
     let monacoEditor = null;
     let activeFileKey = 'index.html';
 
-    // Blank Workspace Files State (Starts Empty by default!)
+    // Blank Workspace State
     let workspaceFiles = {
       'index.html': {
         name: 'index.html',
         language: 'html',
-        content: `` // Starts completely empty
+        content: ``
       }
     };
 
-    // Framework Brand Templates Library
+    // Framework Catalog
     let templateCatalog = [
       {
         id: 'tpl-react-tailwind',
-        name: 'React 18 + Tailwind Starter',
+        name: 'React 18 + Tailwind',
         category: 'frontend',
         brand: 'React.js',
-        description: 'Single-page React component setup with CDN Tailwind CSS.',
+        description: 'Single-page React app with Tailwind CSS styling.',
         language: 'html',
         code: `<!DOCTYPE html>
 <html lang="en">
@@ -621,18 +869,21 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
   <script src="https://cdn.tailwindcss.com"><\/script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
   <div id="root"></div>
 
   <script type="text/babel">
     function App() {
       const [count, setCount] = React.useState(0);
       return (
-        <div class="p-8 max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-xl text-center space-y-4">
-          <h1 class="text-2xl font-bold text-sky-400">React + Tailwind</h1>
-          <p class="text-xs text-slate-400">Interactive cloud application deployed with DevDeploy Studio PRO.</p>
-          <button onClick={() => setCount(c => c + 1)} class="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg font-medium text-xs">
-            Clicks: {count}
+        <div className="p-8 max-w-sm bg-slate-900 border border-slate-800 rounded-2xl shadow-xl text-center space-y-4">
+          <div className="w-12 h-12 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-xl flex items-center justify-center mx-auto text-xl">
+            ⚛️
+          </div>
+          <h1 className="text-xl font-bold text-sky-400">React + Tailwind</h1>
+          <p className="text-xs text-slate-400">Interactive component running live inside DevDeploy Studio ULTRA.</p>
+          <button onClick={() => setCount(c => c + 1)} className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-xl font-medium text-xs text-white transition">
+            Counter: {count}
           </button>
         </div>
       );
@@ -644,10 +895,10 @@
       },
       {
         id: 'tpl-vue3',
-        name: 'Vue.js 3 Reactive Starter',
+        name: 'Vue 3 Standalone Starter',
         category: 'frontend',
         brand: 'Vue.js',
-        description: 'Standalone Vue 3 reactive setup with script composition.',
+        description: 'Vue 3 reactive app setup using Vue global build.',
         language: 'html',
         code: `<!DOCTYPE html>
 <html lang="en">
@@ -657,11 +908,13 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>
   <script src="https://cdn.tailwindcss.com"><\/script>
 </head>
-<body class="bg-slate-950 text-white flex items-center justify-center min-h-screen">
-  <div id="app" class="p-6 bg-slate-900 border border-slate-800 rounded-xl text-center space-y-3">
+<body class="bg-slate-950 text-white flex items-center justify-center min-h-screen p-4">
+  <div id="app" class="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-center space-y-3 max-w-sm">
     <h2 class="text-xl font-bold text-emerald-400">{{ title }}</h2>
-    <p class="text-xs text-slate-400">Counter: {{ counter }}</p>
-    <button @click="counter++" class="px-3 py-1.5 bg-emerald-600 rounded text-xs font-semibold">Increment</button>
+    <p class="text-xs text-slate-400">Clicks logged: {{ counter }}</p>
+    <button @click="counter++" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-semibold">
+      Increment Count
+    </button>
   </div>
 
   <script>
@@ -676,50 +929,10 @@
   <\/script>
 </body>
 </html>`
-      },
-      {
-        id: 'tpl-express-api',
-        name: 'Node.js Express REST API',
-        category: 'backend',
-        brand: 'Node.js',
-        description: 'Clean REST endpoint template with CORS and healthcheck route.',
-        language: 'javascript',
-        code: `const express = require('express');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', uptime: process.uptime(), timestamp: Date.now() });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));`
-      },
-      {
-        id: 'tpl-python-fastapi',
-        name: 'Python FastAPI Microservice',
-        category: 'backend',
-        brand: 'Python',
-        description: 'FastAPI Python script template for serverless endpoints.',
-        language: 'python',
-        code: `from fastapi import FastAPI
-
-app = FastAPI(title="DevDeploy Microservice")
-
-@app.get("/")
-def read_root():
-    return {"status": "FastAPI Online", "service": "DevDeploy PRO"}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    return {"item_id": item_id, "active": True}`
       }
     ];
 
-    // Initialization on Page Load
+    // Initialization
     window.onload = function() {
       lucide.createIcons();
       initMonacoEditor();
@@ -727,21 +940,20 @@ def read_item(item_id: int):
       renderTemplatesGrid();
       loadTokensFromStorage();
       checkEmptyWorkspaceStatus();
+      refreshLivePreview();
     };
 
-    // View Switcher Engine with Smooth Animations
+    // Navigation Switcher
     function switchView(viewId) {
       if (currentView === viewId) return;
 
-      // Deactivate current view
       const currentEl = document.getElementById(`view-${currentView}`);
       if (currentEl) {
         currentEl.classList.remove('active');
         currentEl.classList.add('inactive');
       }
 
-      // Update Nav Buttons State (Desktop + Mobile)
-      ['editor', 'templates', 'deploy', 'ai', 'logs'].forEach(v => {
+      ['editor', 'merger', 'preview', 'templates', 'deploy', 'ai', 'logs'].forEach(v => {
         const dBtn = document.getElementById(`nav-desktop-${v}`);
         const mBtn = document.getElementById(`nav-mobile-${v}`);
 
@@ -760,7 +972,6 @@ def read_item(item_id: int):
         }
       });
 
-      // Activate new view
       currentView = viewId;
       const newEl = document.getElementById(`view-${viewId}`);
       if (newEl) {
@@ -768,13 +979,14 @@ def read_item(item_id: int):
         newEl.classList.add('active');
       }
 
-      // Re-layout Monaco Editor if returning to editor
       if (viewId === 'editor' && monacoEditor) {
         setTimeout(() => monacoEditor.layout(), 100);
+      } else if (viewId === 'preview') {
+        refreshLivePreview();
       }
     }
 
-    // Monaco Editor Setup
+    // Monaco Editor Init
     function initMonacoEditor() {
       require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
       require(['vs/editor/editor.main'], function () {
@@ -802,7 +1014,183 @@ def read_item(item_id: int):
       });
     }
 
-    // Workspace Management Functions
+    // Interactive Live Preview Engine
+    function refreshLivePreview() {
+      const frame = document.getElementById('interactive-preview-frame');
+      if (!frame) return;
+
+      const codeToRender = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
+      
+      if (!codeToRender.trim()) {
+        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add code or load a template to preview live.</p></body></html>`;
+        return;
+      }
+
+      frame.srcdoc = codeToRender;
+      logTerminal('INFO', 'Live Preview frame updated.');
+    }
+
+    function setPreviewViewport(mode) {
+      const frame = document.getElementById('interactive-preview-frame');
+      if (!frame) return;
+
+      ['desktop', 'tablet', 'mobile'].forEach(m => {
+        const btn = document.getElementById(`vp-btn-${m}`);
+        if (m === mode) {
+          btn.className = "px-2.5 py-1 rounded-md bg-blue-600 text-white font-medium flex items-center space-x-1 transition";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition";
+        }
+      });
+
+      frame.className = `preview-${mode} bg-white border-0 transition-all duration-300 shadow-2xl rounded-lg`;
+    }
+
+    function openPreviewNewTab() {
+      const content = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
+      const win = window.open();
+      if (win) {
+        win.document.write(content);
+        win.document.close();
+      }
+    }
+
+    // SCRIPT TAG HELPER FUNCTIONS
+    function insertSnippetToEditor(snippet) {
+      if (!monacoEditor) return;
+      const selection = monacoEditor.getSelection();
+      const op = { range: selection, text: snippet, forceMoveMarkers: true };
+      monacoEditor.executeEdits("snippet-helper", [op]);
+      monacoEditor.focus();
+      showToast("Inserted tag helper snippet!", "info");
+    }
+
+    function appendToSlot(slotId, code) {
+      const el = document.getElementById(slotId);
+      if (!el) return;
+      el.value += code;
+      showToast("Appended snippet to slot!", "info");
+    }
+
+    function toggleHelperDrawer() {
+      document.getElementById('drawer-tag-helper')?.classList.toggle('hidden');
+    }
+
+    function insertHelperFromDrawer(code) {
+      insertSnippetToEditor(code);
+      toggleHelperDrawer();
+    }
+
+    // MULTI-SCRIPT MERGER ENGINE (3-IN-1)
+    function executeScriptBundle() {
+      const s1 = document.getElementById('merger-script1').value.trim();
+      const s2 = document.getElementById('merger-script2').value.trim();
+      const s3 = document.getElementById('merger-script3').value.trim();
+
+      if (!s1 && !s2 && !s3) {
+        showToast("Please enter or upload code in at least one script slot.", "warn");
+        return;
+      }
+
+      let mergedHTML = "";
+
+      if (s1.includes('<html') || s1.includes('<body') || s1.includes('<!DOCTYPE')) {
+        mergedHTML = s1;
+
+        if (s2) {
+          if (mergedHTML.includes('</head>')) {
+            mergedHTML = mergedHTML.replace('</head>', `<style>\n${s2}\n</style>\n</head>`);
+          } else {
+            mergedHTML = `<style>\n${s2}\n</style>\n` + mergedHTML;
+          }
+        }
+
+        if (s3) {
+          if (mergedHTML.includes('</body>')) {
+            mergedHTML = mergedHTML.replace('</body>', `<script>\n${s3}\n<\/script>\n</body>`);
+          } else {
+            mergedHTML += `\n<script>\n${s3}\n<\/script>`;
+          }
+        }
+      } else {
+        mergedHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bundled App</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  ${s2 ? `<style>\n${s2}\n</style>` : ''}
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4">
+  ${s1 || '<div id="app"></div>'}
+  ${s3 ? `<script>\n${s3}\n<\/script>` : ''}
+</body>
+</html>`;
+      }
+
+      workspaceFiles['index.html'] = {
+        name: 'index.html',
+        language: 'html',
+        content: mergedHTML
+      };
+
+      if (monacoEditor && activeFileKey === 'index.html') {
+        monacoEditor.setValue(mergedHTML);
+      }
+
+      showToast("Bundled 3 scripts into index.html!", "success");
+      logTerminal('SUCCESS', 'Merged 3 separate scripts into single unified file structure.');
+      
+      switchView('editor');
+    }
+
+    function handleScriptFileUpload(event, slot) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (slot === 'script1') document.getElementById('merger-script1').value = e.target.result;
+        if (slot === 'script2') document.getElementById('merger-script2').value = e.target.result;
+        if (slot === 'script3') document.getElementById('merger-script3').value = e.target.result;
+        showToast(`Loaded ${file.name} into ${slot}`, "info");
+      };
+      reader.readAsText(file);
+    }
+
+    function loadSampleMergerScripts() {
+      document.getElementById('merger-script1').value = `<div class="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">
+  <h1 id="title" class="text-2xl font-bold text-purple-400">3-Script Merger App</h1>
+  <p class="text-xs text-slate-400">HTML structure, CSS styles, and JS logic merged together seamlessly.</p>
+  <button id="btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold text-white transition">Click Action</button>
+</div>`;
+
+      document.getElementById('merger-script2').value = `/* Custom Pulsing Hover CSS */
+#btn {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+#btn:hover {
+  transform: scale(1.05);
+}`;
+
+      document.getElementById('merger-script3').value = `document.getElementById('btn').addEventListener('click', function() {
+  const title = document.getElementById('title');
+  title.innerText = "Script Interaction Triggered!";
+  title.style.color = "#34d399";
+});`;
+
+      showToast("Loaded 3 sample scripts!", "info");
+    }
+
+    function clearMergerSlots() {
+      document.getElementById('merger-script1').value = "";
+      document.getElementById('merger-script2').value = "";
+      document.getElementById('merger-script3').value = "";
+      showToast("Cleared script merger slots.", "info");
+    }
+
+    // Workspace & Tab Helpers
     function renderFileTabs() {
       const bar = document.getElementById('file-tabs-bar');
       if (!bar) return;
@@ -813,9 +1201,9 @@ def read_item(item_id: int):
         const isActive = key === activeFileKey;
         
         const tab = document.createElement('button');
-        tab.className = `px-3 py-1 rounded-md text-xs font-mono flex items-center space-x-1.5 transition ${
+        tab.className = `px-3 py-1 rounded-lg text-xs font-mono flex items-center space-x-1.5 transition ${
           isActive 
-            ? 'bg-slate-800 text-blue-400 border border-slate-700 font-semibold' 
+            ? 'bg-slate-800 text-purple-400 border border-slate-700 font-bold' 
             : 'bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
         }`;
         
@@ -865,13 +1253,12 @@ def read_item(item_id: int):
     }
 
     function createNewFilePrompt() {
-      const name = prompt("Enter file name (e.g., app.js, style.css, index.html):");
+      const name = prompt("Enter file name (e.g., script.js, style.css):");
       if (!name) return;
 
       let lang = 'javascript';
       if (name.endsWith('.html')) lang = 'html';
       else if (name.endsWith('.css')) lang = 'css';
-      else if (name.endsWith('.py')) lang = 'python';
 
       workspaceFiles[name] = { name, language: lang, content: '' };
       setActiveFile(name);
@@ -885,11 +1272,10 @@ def read_item(item_id: int):
     }
 
     function clearWorkspace() {
-      if (confirm("Clear code in active file?")) {
-        workspaceFiles[activeFileKey].content = '';
-        if (monacoEditor) monacoEditor.setValue('');
-        checkEmptyWorkspaceStatus();
-      }
+      workspaceFiles[activeFileKey].content = '';
+      if (monacoEditor) monacoEditor.setValue('');
+      checkEmptyWorkspaceStatus();
+      showToast("Cleared current file code.", "info");
     }
 
     function loadTestTemplate() {
@@ -902,12 +1288,15 @@ def read_item(item_id: int):
   <script src="https://cdn.tailwindcss.com"><\/script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
-  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800">
-    <div class="w-12 h-12 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mx-auto">
+  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mx-auto text-xl">
       ⚡
     </div>
-    <h1 class="text-xl font-bold text-blue-400">DevDeploy Studio PRO</h1>
-    <p class="text-xs text-slate-400">Sample test script loaded successfully into the editor.</p>
+    <h1 class="text-xl font-bold text-purple-400">DevDeploy Studio ULTRA</h1>
+    <p class="text-xs text-slate-400">Sample test application code loaded successfully into the editor.</p>
+    <button onclick="alert('Interactive Test Triggered!')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition">
+      Test Interactive Click
+    </button>
   </div>
 </body>
 </html>`;
@@ -920,7 +1309,8 @@ def read_item(item_id: int):
 
       switchView('editor');
       setActiveFile('index.html');
-      logTerminal('SUCCESS', 'Loaded Sample Test Template into editor workspace.');
+      showToast("Sample test template loaded into editor!", "success");
+      logTerminal('SUCCESS', 'Loaded Sample Test Template into workspace.');
     }
 
     function downloadZip() {
@@ -929,13 +1319,14 @@ def read_item(item_id: int):
       zip.generateAsync({ type: 'blob' }).then(blob => {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'devdeploy-project.zip';
+        a.download = 'devdeploy-ultra-project.zip';
         a.click();
-        logTerminal('SUCCESS', 'Exported source code as ZIP archive.');
+        showToast("Downloaded source ZIP archive!", "success");
+        logTerminal('SUCCESS', 'Exported source files as ZIP.');
       });
     }
 
-    // Template Library Functions
+    // Template Functions
     function renderTemplatesGrid() {
       const grid = document.getElementById('templates-grid');
       if (!grid) return;
@@ -943,11 +1334,11 @@ def read_item(item_id: int):
 
       templateCatalog.forEach(tpl => {
         const card = document.createElement('div');
-        card.className = 'glass-card p-5 rounded-xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition';
+        card.className = 'glass-card p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition';
         card.innerHTML = `
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">${tpl.brand}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">${tpl.brand}</span>
               <span class="text-[10px] text-slate-500 uppercase font-mono">${tpl.category}</span>
             </div>
             <h3 class="font-bold text-sm text-slate-100">${tpl.name}</h3>
@@ -955,7 +1346,7 @@ def read_item(item_id: int):
           </div>
 
           <div class="pt-3 border-t border-slate-800/80 flex items-center justify-end">
-            <button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition">
+            <button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition">
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
               <span>Use Template</span>
             </button>
@@ -977,36 +1368,11 @@ def read_item(item_id: int):
       };
       switchView('editor');
       setActiveFile('index.html');
+      showToast(`Loaded ${tpl.name}!`, "success");
       logTerminal('SUCCESS', `Loaded template [${tpl.name}] into editor.`);
     }
 
-    function openAddModal() { document.getElementById('modal-custom-script').classList.remove('hidden'); }
-    function closeAddModal() { document.getElementById('modal-custom-script').classList.add('hidden'); }
-
-    function saveCustomTemplate() {
-      const name = document.getElementById('modal-title').value;
-      const cat = document.getElementById('modal-cat').value;
-      const lang = document.getElementById('modal-lang').value;
-      const code = document.getElementById('modal-code').value;
-
-      if (!name || !code) return alert("Title and code required.");
-
-      templateCatalog.push({
-        id: `custom_${Date.now()}`,
-        name,
-        category: cat,
-        brand: 'Custom',
-        description: 'User saved script template.',
-        language: lang,
-        code
-      });
-
-      renderTemplatesGrid();
-      closeAddModal();
-      alert("Custom template saved!");
-    }
-
-    // Deploy Target Management
+    // Deploy Functions
     function setDeployTarget(target) {
       activeDeployTarget = target;
       document.getElementById('target-display-label').innerText = target.toUpperCase();
@@ -1015,7 +1381,7 @@ def read_item(item_id: int):
       ['vercel', 'github', 'netlify'].forEach(t => {
         const card = document.getElementById(`target-card-${t}`);
         if (t === target) {
-          card.className = "target-card p-4 rounded-xl border border-blue-500 bg-blue-500/10 flex flex-col items-center justify-center space-y-2 text-white transition";
+          card.className = "target-card p-4 rounded-xl border border-purple-500 bg-purple-500/10 flex flex-col items-center justify-center space-y-2 text-white transition";
         } else {
           card.className = "target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition";
         }
@@ -1026,27 +1392,28 @@ def read_item(item_id: int):
       const projName = document.getElementById('deploy-proj-name').value || 'my-app';
       switchView('logs');
       
-      logTerminal('INFO', `Starting deployment sequence for target: ${activeDeployTarget.toUpperCase()}`);
-      logTerminal('INFO', `Project Name: ${projName}`);
+      logTerminal('INFO', `Initiating cloud deployment for ${activeDeployTarget.toUpperCase()}...`);
+      logTerminal('INFO', `Project Slug: ${projName}`);
       
       const steps = [
         `[1/4] Packaging workspace files (${Object.keys(workspaceFiles).join(', ')})...`,
-        `[2/4] Verifying syntax & dependencies...`,
-        `[3/4] Triggering build hook on ${activeDeployTarget.toUpperCase()} edge servers...`,
-        `[4/4] SUCCESS! Deployed live at: https://${projName}.${activeDeployTarget}.app`
+        `[2/4] Validating HTML/JS bundle integrity...`,
+        `[3/4] Dispatching webhook to ${activeDeployTarget.toUpperCase()} build servers...`,
+        `[4/4] SUCCESS! Live URL: https://${projName}.${activeDeployTarget}.app`
       ];
 
       steps.forEach((msg, idx) => {
         setTimeout(() => {
           logTerminal(idx === 3 ? 'SUCCESS' : 'INFO', msg);
+          if (idx === 3) showToast("Cloud deployment finished successfully!", "success");
         }, (idx + 1) * 700);
       });
     }
 
-    // AI Helper Functions
+    // AI Functions
     async function runAIOptimizer(mode) {
       const input = document.getElementById('ai-input-box').value;
-      if (!input) return alert("Input text required.");
+      if (!input) return showToast("Please enter source input text or code.", "warn");
 
       const out = document.getElementById('ai-output-box');
       out.innerText = "Processing request with Gemini AI...";
@@ -1055,9 +1422,9 @@ def read_item(item_id: int):
         const apiKey = "";
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-        let prompt = `Translate comments/documentation to professional technical English:\n\n${input}`;
-        if (mode === 'readme') prompt = `Generate a markdown README.md in English for:\n\n${input}`;
-        if (mode === 'refactor') prompt = `Refactor and polish code with English comments:\n\n${input}`;
+        let prompt = `Translate comments and docs to fluent technical English:\n\n${input}`;
+        if (mode === 'readme') prompt = `Write a clean English markdown README.md for:\n\n${input}`;
+        if (mode === 'refactor') prompt = `Refactor code with clean English comments:\n\n${input}`;
 
         const res = await fetch(apiUrl, {
           method: 'POST',
@@ -1066,25 +1433,29 @@ def read_item(item_id: int):
         });
 
         const data = await res.json();
-        out.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error processing output.";
+        out.innerText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating AI response.";
+        showToast("AI response generated!", "success");
       } catch (err) {
-        out.innerText = "AI Request failed: " + err.message;
+        out.innerText = "AI Request error: " + err.message;
+        showToast("AI Request failed", "warn");
       }
     }
 
     function importActiveFileToAI() {
       document.getElementById('ai-input-box').value = workspaceFiles[activeFileKey]?.content || '';
+      showToast("Loaded active editor code into AI input", "info");
     }
 
     function copyAIOutput() {
       navigator.clipboard.writeText(document.getElementById('ai-output-box').innerText);
-      alert("Copied AI output!");
+      showToast("Copied AI output to clipboard!", "success");
     }
 
     function applyAIToActiveFile() {
       const text = document.getElementById('ai-output-box').innerText;
       if (monacoEditor && workspaceFiles[activeFileKey]) {
         monacoEditor.setValue(text);
+        showToast("Applied AI output to active editor file!", "success");
         switchView('editor');
       }
     }
@@ -1106,6 +1477,7 @@ def read_item(item_id: int):
 
     function clearTerminalLogs() {
       document.getElementById('terminal-console-output').innerHTML = '';
+      showToast("Terminal logs cleared", "info");
     }
 
     function downloadTerminalLog() {
@@ -1113,15 +1485,16 @@ def read_item(item_id: int):
       const blob = new Blob([text], { type: 'text/plain' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'devdeploy-terminal.log';
+      a.download = 'devdeploy-ultra-logs.log';
       a.click();
     }
 
-    // Token LocalStorage
+    // Tokens Persistence
     function saveToken(target) {
       const val = document.getElementById(`input-token-${target}`).value;
       localStorage.setItem(`token_${target}`, val);
       loadTokensFromStorage();
+      showToast(`Saved ${target} API token`, "success");
     }
 
     function loadTokensFromStorage() {
@@ -1142,11 +1515,27 @@ def read_item(item_id: int):
       });
     }
 
-    function filterCategory(cat) {
-      document.querySelectorAll('#templates-grid > div').forEach(card => {
-        if (cat === 'all') card.style.display = 'flex';
-        else card.style.display = card.innerText.toLowerCase().includes(cat) ? 'flex' : 'none';
-      });
+    // Custom Toast Notification System
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      let bgColor = 'bg-slate-900 border-slate-700 text-slate-200';
+      if (type === 'success') bgColor = 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
+      if (type === 'warn') bgColor = 'bg-amber-950/90 border-amber-500/50 text-amber-200';
+
+      toast.className = `toast-anim px-4 py-2.5 rounded-xl border ${bgColor} text-xs font-medium shadow-xl backdrop-blur-md flex items-center space-x-2 pointer-events-auto`;
+      toast.innerHTML = `<span>${message}</span>`;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.2s ease-out';
+        setTimeout(() => toast.remove(), 200);
+      }, 3000);
     }
   </script>
 </body>
