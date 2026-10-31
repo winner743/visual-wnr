@@ -1,1898 +1,730 @@
 <!DOCTYPE html>
 <html lang="en" class="dark h-full bg-slate-950">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DevDeploy Studio ULTRA - IDE, 3-Script Merger & AI Generator</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              vercel: '#ffffff',
-              github: '#2ea44f',
-              netlify: '#00c7b7',
-              accent: '#3b82f6',
-              purple: '#a855f7',
-              emerald: '#10b981',
-              darkBg: '#030712',
-              panelBg: '#0b1120',
-              borderBg: '#1e293b'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DevDeploy Studio Ultimate v5.0</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            emerald: '#10b981',
+                            blue: '#3b82f6',
+                            github: '#2ea44f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
             }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'Fira Code', 'Monaco', 'monospace']
-          }
         }
-      }
-    }
-  </script>
+    </script>
 
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- JSZip for Exporting ZIP Archives -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Monaco Editor Loader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
 
-  <style>
-    /* Custom Smooth Scrollbar */
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #030712;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
-    }
+    <style>
+        /* Custom Smooth Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Glassmorphic Panel Styles */
-    .glass-card {
-      background: rgba(11, 17, 32, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
+        .helper-scroll::-webkit-scrollbar { display: none; }
 
-    /* Tab Transition Animations */
-    .view-panel {
-      transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: opacity, transform;
-    }
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    .view-panel.active {
-      display: flex !important;
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
+        /* View Transitions */
+        .view-panel {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+        }
 
-    .view-panel.inactive {
-      display: none !important;
-      opacity: 0;
-      transform: translateY(8px) scale(0.99);
-      pointer-events: none;
-    }
+        .view-panel.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-    /* Preview Viewport Dimensions */
-    .preview-desktop { width: 100%; height: 100%; max-width: 100%; }
-    .preview-tablet  { width: 768px; height: 100%; max-width: 100%; margin: 0 auto; border-radius: 12px; }
-    .preview-mobile  { width: 375px; height: 600px; max-width: 100%; margin: 0 auto; border-radius: 16px; }
-
-    /* Custom Toast Notification Animation */
-    @keyframes slideInUp {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .toast-anim {
-      animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    /* Horizontal Helper Button Scrollbar styling */
-    .helper-scroll {
-      scrollbar-width: none;
-    }
-    .helper-scroll::-webkit-scrollbar {
-      display: none;
-    }
-  </style>
+        /* Animations */
+        @keyframes radar-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .animate-radar { animation: radar-spin 2.5s linear infinite; }
+        
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-show { animation: slideInUp 0.3s forwards; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans h-full overflow-hidden flex flex-col antialiased select-none">
+<body class="text-slate-200 font-sans h-full flex flex-col overflow-hidden select-none">
 
-  <!-- TOP APP HEADER -->
-  <header class="h-14 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-3 md:px-4 flex items-center justify-between z-40 shrink-0">
-    <!-- Brand Logo & Tag -->
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-        <i data-lucide="code-2" class="w-5 h-5"></i>
-      </div>
-      <div class="flex items-center space-x-2">
-        <span class="font-bold text-sm tracking-wide text-white">DevDeploy<span class="text-purple-400">ULTRA</span></span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono font-semibold">v4.6</span>
-      </div>
+    <!-- HEADER -->
+    <header class="h-14 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between z-40 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-purple to-brand-blue flex items-center justify-center text-white shadow-lg shadow-brand-purple/20">
+                <i data-lucide="terminal-square" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm leading-tight">DevDeploy <span class="text-brand-purple">ULTIMATE</span></h1>
+                <p class="text-[10px] text-slate-400 font-mono">v5.0 Engine</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="switchMenu('preview')" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Run Live</span>
+            </button>
+            <button onclick="switchMenu('deploy')" class="px-3 py-1.5 bg-brand-blue hover:bg-blue-400 text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-md shadow-blue-500/20 transition">
+                <i data-lucide="rocket" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Deploy</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- DESKTOP SIDEBAR -->
+        <aside class="hidden md:flex flex-col w-56 bg-slate-900/50 border-r border-slate-800 p-3 space-y-1.5 shrink-0 z-10">
+            <button onclick="switchMenu('editor')" id="nav-desktop-editor" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-brand-purple bg-brand-purple/10 border border-brand-purple/20">
+                <i data-lucide="code-2" class="w-4 h-4 shrink-0"></i> <span>Editor</span>
+            </button>
+            <button onclick="switchMenu('merger')" id="nav-desktop-merger" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all border border-transparent">
+                <i data-lucide="layers" class="w-4 h-4 shrink-0"></i> <span>5-Slot Merger</span>
+            </button>
+            <button onclick="switchMenu('preview')" id="nav-desktop-preview" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all border border-transparent">
+                <i data-lucide="monitor-play" class="w-4 h-4 shrink-0"></i> <span>Live Preview</span>
+            </button>
+            <button onclick="switchMenu('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all border border-transparent">
+                <i data-lucide="sparkles" class="w-4 h-4 shrink-0 text-amber-400"></i> <span>AI Generator</span>
+            </button>
+            <button onclick="switchMenu('deploy')" id="nav-desktop-deploy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all border border-transparent">
+                <i data-lucide="cloud-upload" class="w-4 h-4 shrink-0"></i> <span>Deploy Hub</span>
+            </button>
+        </aside>
+
+        <!-- VIEWS CONTAINER -->
+        <main class="flex-1 relative bg-[#090e17]">
+
+            <!-- ========================================== -->
+            <!-- 1. EDITOR VIEW                             -->
+            <!-- ========================================== -->
+            <section id="view-editor" class="view-panel active h-full flex-col p-2 md:p-4 space-y-2 pb-20 md:pb-4 overflow-y-auto">
+                
+                <div class="glass-panel rounded-xl border border-slate-800 px-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="file-json-2" class="w-4 h-4 text-brand-purple"></i>
+                        <select id="editor-lang" onchange="changeLanguage()" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand-purple hover:bg-slate-800 cursor-pointer">
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="lua">Lua</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="shell">Shell (Linux)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2 overflow-x-auto helper-scroll py-1" id="tag-helper-toolbar">
+                        <!-- Dynamic buttons injected here -->
+                    </div>
+                    <button onclick="clearEditor()" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-xs font-semibold flex items-center space-x-1 shrink-0 transition">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Clear</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 rounded-xl border border-slate-800 overflow-hidden bg-[#1e1e1e] relative flex flex-col min-h-[300px] shadow-inner">
+                    <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center text-slate-500 text-xs font-mono z-10 bg-[#1e1e1e]">
+                        Loading Editor Engine...
+                    </div>
+                    <div id="monaco-container" class="w-full h-full"></div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 2. 5-SLOT MERGER VIEW                      -->
+            <!-- ========================================== -->
+            <section id="view-merger" class="view-panel h-full flex-col p-4 md:p-6 space-y-4 pb-24 md:pb-6 overflow-y-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center"><i data-lucide="layers" class="w-5 h-5 mr-2 text-brand-purple"></i> 5-Slot Script Merger</h2>
+                        <p class="text-xs text-slate-400">Combine multiple code segments into a unified HTML document.</p>
+                    </div>
+                    <button onclick="bundleMerger()" class="px-4 py-2 bg-gradient-to-r from-brand-purple to-brand-blue hover:opacity-90 text-white rounded-xl text-xs font-bold shadow-lg shadow-brand-purple/25 flex items-center space-x-1.5 transition">
+                        <i data-lucide="combine" class="w-4 h-4"></i> <span>Bundle & Push</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Slot 1 -->
+                    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-amber-400">1. Head / Meta</span>
+                            <button onclick="document.getElementById('m-slot1').value=''" class="text-slate-500 hover:text-rose-400">Clear</button>
+                        </div>
+                        <textarea id="m-slot1" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono resize-none focus:border-amber-400 focus:outline-none" rows="5" placeholder="<meta name='description' content='...'>"></textarea>
+                    </div>
+                    <!-- Slot 2 -->
+                    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-sky-400">2. External CDNs</span>
+                            <button onclick="document.getElementById('m-slot2').value=''" class="text-slate-500 hover:text-rose-400">Clear</button>
+                        </div>
+                        <textarea id="m-slot2" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono resize-none focus:border-sky-400 focus:outline-none" rows="5" placeholder="<script src='https://cdn.tailwindcss.com'><\/script>"></textarea>
+                    </div>
+                    <!-- Slot 3 -->
+                    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-fuchsia-400">3. CSS Styling</span>
+                            <button onclick="document.getElementById('m-slot3').value=''" class="text-slate-500 hover:text-rose-400">Clear</button>
+                        </div>
+                        <textarea id="m-slot3" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono resize-none focus:border-fuchsia-400 focus:outline-none" rows="5" placeholder="body { background: #000; }"></textarea>
+                    </div>
+                    <!-- Slot 4 -->
+                    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2 md:col-span-2 lg:col-span-1">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-emerald-400">4. HTML Body</span>
+                            <button onclick="document.getElementById('m-slot4').value=''" class="text-slate-500 hover:text-rose-400">Clear</button>
+                        </div>
+                        <textarea id="m-slot4" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono resize-none focus:border-emerald-400 focus:outline-none" rows="5" placeholder="<div id='app'>Hello World</div>"></textarea>
+                    </div>
+                    <!-- Slot 5 -->
+                    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2 md:col-span-2 lg:col-span-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-yellow-400">5. JS Logic</span>
+                            <button onclick="document.getElementById('m-slot5').value=''" class="text-slate-500 hover:text-rose-400">Clear</button>
+                        </div>
+                        <textarea id="m-slot5" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs font-mono resize-none focus:border-yellow-400 focus:outline-none" rows="5" placeholder="console.log('App Loaded');"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 3. LIVE PREVIEW VIEW                       -->
+            <!-- ========================================== -->
+            <section id="view-preview" class="view-panel h-full flex-col p-2 md:p-4 space-y-3 pb-20 md:pb-4 overflow-y-auto">
+                <div class="glass-panel rounded-xl border border-slate-800 px-4 py-2 flex items-center justify-between shrink-0">
+                    <span class="text-xs font-bold text-emerald-400 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span> Sandbox Live View</span>
+                    <button onclick="refreshPreview()" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-slate-300 transition"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>
+                </div>
+                
+                <div class="flex-1 bg-white rounded-xl overflow-hidden border border-slate-700 min-h-[250px]">
+                    <iframe id="preview-frame" class="w-full h-full border-0" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-slate-800 p-3 h-32 shrink-0 flex flex-col">
+                    <div class="flex justify-between items-center mb-2 border-b border-slate-800/50 pb-1">
+                        <span class="text-[11px] font-bold text-slate-300 flex items-center"><i data-lucide="terminal" class="w-3.5 h-3.5 mr-1 text-rose-400"></i> Error Detector Console</span>
+                        <button onclick="clearConsole()" class="text-[10px] text-slate-500 hover:text-slate-300">Clear</button>
+                    </div>
+                    <div id="preview-console" class="flex-1 overflow-y-auto font-mono text-[10px] space-y-1">
+                        <div class="text-slate-500 italic">Listening for JavaScript errors...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 4. AI GENERATOR VIEW                       -->
+            <!-- ========================================== -->
+            <section id="view-ai" class="view-panel h-full flex-col p-4 md:p-6 space-y-4 pb-24 md:pb-6 overflow-y-auto max-w-4xl mx-auto w-full">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center"><i data-lucide="sparkles" class="w-5 h-5 mr-2 text-amber-400"></i> Smart AI Generator</h2>
+                    <p class="text-xs text-slate-400">Describe the script or app you need. The engine will generate optimized code.</p>
+                </div>
+
+                <div class="glass-panel p-4 rounded-xl space-y-3">
+                    <label class="text-xs font-semibold text-slate-300">Prompt / Command</label>
+                    <textarea id="ai-prompt" rows="3" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono focus:outline-none focus:border-amber-400 resize-none" placeholder="e.g., Buat script Java tulisa hi kalau di pencet berubah halo"></textarea>
+                    <button onclick="generateAI()" class="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition flex items-center space-x-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i> <span>Generate Code</span>
+                    </button>
+                </div>
+
+                <div class="glass-panel p-4 rounded-xl flex-1 flex flex-col space-y-2 min-h-[250px]">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-emerald-400">Generated Output</span>
+                        <button onclick="pushAiToEditor()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded-lg transition">Push to Editor</button>
+                    </div>
+                    <textarea id="ai-output" readonly class="flex-1 w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs font-mono text-emerald-300 resize-none focus:outline-none" placeholder="Result will appear here..."></textarea>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 5. DEPLOY HUB VIEW (GITHUB FIX)            -->
+            <!-- ========================================== -->
+            <section id="view-deploy" class="view-panel h-full flex-col p-4 md:p-6 space-y-6 pb-24 md:pb-6 overflow-y-auto max-w-3xl mx-auto w-full">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center"><i data-lucide="cloud-upload" class="w-5 h-5 mr-2 text-brand-blue"></i> Cloud Deploy Hub</h2>
+                    <p class="text-xs text-slate-400">Publish your workspace directly to the web.</p>
+                </div>
+
+                <!-- 1. INITIAL FORM STATE -->
+                <div id="deploy-form-state" class="space-y-6">
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="p-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 flex flex-col items-center gap-1 opacity-50 cursor-not-allowed"><i data-lucide="triangle" class="w-5 h-5"></i><span class="text-[10px] font-bold">Vercel</span></button>
+                        <button class="p-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 flex flex-col items-center gap-1 opacity-50 cursor-not-allowed"><i data-lucide="globe" class="w-5 h-5"></i><span class="text-[10px] font-bold">Netlify</span></button>
+                        <!-- GITHUB SELECTED ACTIVE -->
+                        <button class="p-3 rounded-xl bg-brand-github/20 border border-brand-github text-white flex flex-col items-center gap-1 shadow-lg shadow-brand-github/20"><i data-lucide="github" class="w-5 h-5"></i><span class="text-[10px] font-bold">GitHub Pages</span></button>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">GitHub Username</label>
+                            <input type="text" id="deploy-user" value="winner743" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono focus:border-brand-github focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">Project / Repository Name</label>
+                            <input type="text" id="deploy-repo" value="visual-wnr" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono focus:border-brand-github focus:outline-none">
+                        </div>
+                        <button onclick="startDeploy()" class="w-full py-3 bg-brand-github hover:bg-green-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-brand-github/30 transition flex justify-center items-center gap-2">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Start Deploy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. SCANNER STATE -->
+                <div id="deploy-scanner-state" class="hidden flex-col items-center justify-center py-10 space-y-6">
+                    <div class="relative w-24 h-24 flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full border-2 border-dashed border-emerald-500/30 animate-radar"></div>
+                        <i data-lucide="satellite" class="w-10 h-10 text-emerald-400 animate-pulse"></i>
+                    </div>
+                    <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-6 py-3 rounded-xl text-sm font-semibold text-center max-w-sm flex flex-col items-center gap-2">
+                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                        <span>This may take 1 or 2 minute to live a website</span>
+                    </div>
+                </div>
+
+                <!-- 3. SUCCESS STATE -->
+                <div id="deploy-success-state" class="hidden flex-col items-center space-y-5 py-4">
+                    <div class="bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 px-6 py-3 rounded-2xl text-lg font-bold flex items-center gap-2 shadow-xl shadow-emerald-500/20">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i> Website success live!
+                    </div>
+                    
+                    <div class="glass-panel p-5 rounded-xl w-full max-w-md space-y-3">
+                        <a id="link-open" href="#" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex justify-center items-center gap-2 transition">
+                            <i data-lucide="external-link" class="w-4 h-4"></i> Open Website
+                        </a>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="copyDeployLink()" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex justify-center items-center gap-2 transition">
+                                <i data-lucide="copy" class="w-4 h-4"></i> Copy Link
+                            </button>
+                            <a id="link-raw" href="#" target="_blank" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex justify-center items-center gap-2 transition">
+                                <i data-lucide="file-code" class="w-4 h-4"></i> Raw Link
+                            </a>
+                        </div>
+                    </div>
+                    <button onclick="resetDeploy()" class="text-xs text-slate-500 hover:text-slate-300 underline mt-4">Deploy another project</button>
+                </div>
+
+            </section>
+
+        </main>
     </div>
 
-    <!-- Top Quick Action Buttons -->
-    <div class="flex items-center space-x-1.5 md:space-x-2">
-      <!-- Helper Drawer Trigger -->
-      <button onclick="toggleHelperDrawer()" class="px-2.5 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
-        <i data-lucide="code" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Tag Cheat Sheet</span>
-      </button>
-
-      <!-- Load Test Code -->
-      <button onclick="loadTestTemplate()" class="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
-        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Load Sample</span>
-      </button>
-
-      <!-- Live Preview Button -->
-      <button onclick="switchView('preview')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
-        <i data-lucide="play" class="w-3.5 h-3.5"></i>
-        <span>Preview</span>
-      </button>
-
-      <!-- Deploy Quick Trigger -->
-      <button onclick="switchView('deploy')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium text-xs rounded-lg flex items-center space-x-1.5 shadow-md shadow-blue-600/20 transition">
-        <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Deploy</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- MAIN APP BODY LAYOUT -->
-  <div class="flex flex-1 overflow-hidden relative">
-
-    <!-- DESKTOP SIDEBAR NAVIGATION -->
-    <aside class="hidden md:flex w-60 bg-slate-900/70 border-r border-slate-800/80 flex-col justify-between shrink-0">
-      <div class="p-3 space-y-1">
-        
-        <button onclick="switchView('editor')" id="nav-desktop-editor" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-blue-400 bg-blue-500/10 border border-blue-500/20">
-          <i data-lucide="file-code" class="w-4 h-4 shrink-0"></i>
-          <span>Code Editor</span>
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="md:hidden fixed bottom-0 w-full h-16 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 flex items-center justify-around z-50 px-1 pb-safe">
+        <button onclick="switchMenu('editor')" id="nav-mobile-editor" class="nav-btn flex flex-col items-center gap-1 text-brand-purple">
+            <i data-lucide="code-2" class="w-5 h-5"></i><span class="text-[9px] font-medium">Editor</span>
         </button>
-
-        <button onclick="switchView('merger')" id="nav-desktop-merger" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="combine" class="w-4 h-4 text-purple-400 shrink-0"></i>
-          <span>3-Script Merger</span>
-          <span class="ml-auto text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-mono font-semibold">3-IN-1</span>
+        <button onclick="switchMenu('merger')" id="nav-mobile-merger" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i data-lucide="layers" class="w-5 h-5"></i><span class="text-[9px] font-medium">Merger</span>
         </button>
-
-        <button onclick="switchView('preview')" id="nav-desktop-preview" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="play-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-          <span>Live Preview & Errors</span>
+        <button onclick="switchMenu('preview')" id="nav-mobile-preview" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i data-lucide="monitor-play" class="w-5 h-5"></i><span class="text-[9px] font-medium">Preview</span>
         </button>
-
-        <button onclick="switchView('templates')" id="nav-desktop-templates" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="boxes" class="w-4 h-4 shrink-0"></i>
-          <span>Brand Templates</span>
+        <button onclick="switchMenu('ai')" id="nav-mobile-ai" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i data-lucide="sparkles" class="w-5 h-5"></i><span class="text-[9px] font-medium">AI</span>
         </button>
-
-        <button onclick="switchView('deploy')" id="nav-desktop-deploy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="cloud-lightning" class="w-4 h-4 shrink-0"></i>
-          <span>Deploy & Tokens</span>
+        <button onclick="switchMenu('deploy')" id="nav-mobile-deploy" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i data-lucide="cloud-upload" class="w-5 h-5"></i><span class="text-[9px] font-medium">Deploy</span>
         </button>
-
-        <button onclick="switchView('ai')" id="nav-desktop-ai" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>AI Script & Game Generator</span>
-        </button>
-
-        <button onclick="switchView('logs')" id="nav-desktop-logs" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-          <i data-lucide="terminal" class="w-4 h-4 shrink-0"></i>
-          <span>Terminal Logs</span>
-        </button>
-
-      </div>
-
-      <!-- Footer Info Badge -->
-      <div class="p-3 border-t border-slate-800/80">
-        <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800/80 text-[11px] space-y-1.5">
-          <div class="flex items-center justify-between text-slate-400">
-            <span>Editor Engine:</span>
-            <span class="text-emerald-400 font-mono">Monaco JS</span>
-          </div>
-          <div class="flex items-center justify-between text-slate-400">
-            <span>Target Cloud:</span>
-            <span id="sidebar-target-name" class="text-purple-400 font-mono font-bold">VERCEL</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN CONTENT VIEWS CONTAINER -->
-    <main class="flex-1 bg-slate-950 relative overflow-hidden flex flex-col">
-
-      <!-- ========================================== -->
-      <!-- VIEW 1: DEDICATED FULL CODE EDITOR         -->
-      <!-- ========================================== -->
-      <section id="view-editor" class="view-panel active h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4 overflow-y-auto">
-        
-        <!-- Editor Header Toolbar -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0 gap-2 overflow-x-auto">
-          
-          <!-- File Tabs Bar -->
-          <div id="file-tabs-bar" class="flex items-center space-x-1.5 overflow-x-auto pr-2">
-            <!-- Rendered File Tabs -->
-          </div>
-
-          <!-- Actions Bar -->
-          <div class="flex items-center space-x-1.5 shrink-0">
-            
-            <!-- NEW: Dynamic Language Dropdown -->
-            <select id="editor-lang-select" onchange="changeActiveFileLanguage(this.value)" class="bg-slate-950 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-500 hover:bg-slate-800 transition cursor-pointer">
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python</option>
-              <option value="lua">Lua</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-              <option value="shell">Linux / Shell</option>
-            </select>
-
-            <button onclick="createNewFilePrompt()" title="Add File" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 transition flex-shrink-0">
-              <i data-lucide="file-plus" class="w-4 h-4"></i>
-            </button>
-
-            <!-- DELETE ALL TEXT BUTTON -->
-            <button onclick="clearWorkspace()" title="Delete All Text" class="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-semibold flex items-center space-x-1 transition flex-shrink-0">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              <span class="hidden lg:inline">Clear Text</span>
-            </button>
-
-            <button onclick="downloadZip()" title="Download Source ZIP" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium flex items-center space-x-1 transition flex-shrink-0">
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">ZIP</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- QUICK SCRIPT TAG HELPER BAR (EDITOR) -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2 flex items-center space-x-2 shrink-0">
-          <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 shrink-0 flex items-center space-x-1">
-            <i data-lucide="zap" class="w-3 h-3"></i>
-            <span>Quick Helper</span>
-          </span>
-
-          <!-- Dynamic Helper Toolbar Container -->
-          <div id="dynamic-helper-toolbar" class="flex items-center space-x-1.5 overflow-x-auto helper-scroll py-0.5">
-            <!-- Populated via JavaScript based on language -->
-          </div>
-        </div>
-
-        <!-- Editor Container Area -->
-        <div class="flex-1 glass-card rounded-xl border border-slate-800/80 overflow-hidden relative flex flex-col min-h-[350px]">
-          
-          <!-- Empty Workspace Overlay Banner -->
-          <div id="empty-workspace-banner" class="absolute inset-0 bg-slate-950/95 z-20 flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-              <i data-lucide="file-code-2" class="w-6 h-6"></i>
-            </div>
-            <div class="max-w-md space-y-1">
-              <h3 class="font-bold text-base text-slate-200">Workspace is Clean & Blank</h3>
-              <p class="text-xs text-slate-400">Start typing code, tap quick helper tags, or generate apps using the AI Generator.</p>
-            </div>
-            <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
-              <button onclick="loadTestTemplate()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-purple-500/20 transition">
-                🚀 Load Sample Test Code
-              </button>
-              <button onclick="switchView('ai')" class="px-4 py-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 text-xs font-medium rounded-xl transition">
-                ✨ Generate AI Script
-              </button>
-              <button onclick="dismissEmptyBanner()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
-                Start Blank
-              </button>
-            </div>
-          </div>
-
-          <!-- Monaco Editor Frame -->
-          <div id="monaco-container" class="w-full h-full bg-[#1e1e1e] flex-1"></div>
-        </div>
-
-        <!-- Editor Footer Status Bar -->
-        <div class="bg-slate-900/90 border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-400 font-mono shrink-0">
-          <div class="flex items-center space-x-3">
-            <span id="active-lang-badge" class="text-purple-400 font-bold uppercase">HTML</span>
-            <span>UTF-8</span>
-          </div>
-          <div class="flex items-center space-x-3">
-            <span id="active-char-count">0 characters</span>
-            <span class="text-emerald-400">Ready</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 2: MULTI-SCRIPT MERGER (3-IN-1)       -->
-      <!-- ========================================== -->
-      <section id="view-merger" class="view-panel inactive h-full flex-col flex-1 p-3 md:p-6 overflow-y-auto space-y-5 pb-32 md:pb-6">
-        
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <div>
-            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
-              <i data-lucide="combine" class="w-5 h-5 text-purple-400"></i>
-              <span>Multi-Script Merger & Tag Helper</span>
-            </h1>
-            <p class="text-xs text-slate-400">Paste or upload up to 3 scripts (HTML, CSS, JS). Use quick helper buttons or clear text on each slot.</p>
-          </div>
-
-          <button onclick="loadSampleMergerScripts()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-medium flex items-center space-x-1.5 transition">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>Load 3-Script Sample</span>
-          </button>
-        </div>
-
-        <!-- 3 Script Input Cards Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          
-          <!-- SCRIPT 1 SLOT (HTML) -->
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-blue-400 flex items-center space-x-1.5">
-                <span class="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px]">1</span>
-                <span>Script 1 (HTML / Base)</span>
-              </span>
-              <div class="flex items-center space-x-2">
-                <button onclick="clearMergerSlot('merger-script1')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
-                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-blue-400 flex items-center space-x-1">
-                  <i data-lucide="upload" class="w-3 h-3"></i>
-                  <span>Upload File</span>
-                  <input type="file" accept=".html,.txt,.js" class="hidden" onchange="handleScriptFileUpload(event, 'script1')" />
-                </label>
-              </div>
-            </div>
-
-            <!-- HTML Slot Tag Helper Toolbar -->
-            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
-              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
-              <button onclick="appendToSlot('merger-script1', '<h1>Heading Text</h1>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;h1&gt;</button>
-              <button onclick="appendToSlot('merger-script1', '<p>Paragraph description text...</p>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;p&gt;</button>
-              <button onclick="appendToSlot('merger-script1', '<button class=\'btn\'>Click Me</button>\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;button&gt;</button>
-              <button onclick="appendToSlot('merger-script1', '<input type=\'text\' placeholder=\'Enter text...\' />\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;input&gt;</button>
-              <button onclick="appendToSlot('merger-script1', '<img src=\'https://placehold.co/300x200/1e293b/white?text=Image\' alt=\'Image\' />\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-blue-600/30 text-blue-300 rounded font-mono border border-slate-800 shrink-0">&lt;img&gt;</button>
-            </div>
-
-            <textarea id="merger-script1" rows="10" placeholder="<!-- Paste HTML Structure or Tag Script 1 here -->" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-blue-500 resize-none flex-1"></textarea>
-          </div>
-
-          <!-- SCRIPT 2 SLOT (CSS) -->
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-purple-400 flex items-center space-x-1.5">
-                <span class="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[10px]">2</span>
-                <span>Script 2 (CSS / Styling)</span>
-              </span>
-              <div class="flex items-center space-x-2">
-                <button onclick="clearMergerSlot('merger-script2')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
-                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-purple-400 flex items-center space-x-1">
-                  <i data-lucide="upload" class="w-3 h-3"></i>
-                  <span>Upload File</span>
-                  <input type="file" accept=".css,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script2')" />
-                </label>
-              </div>
-            </div>
-
-            <!-- CSS Slot Tag Helper Toolbar -->
-            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
-              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
-              <button onclick="appendToSlot('merger-script2', '.container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">.flex-center</button>
-              <button onclick="appendToSlot('merger-script2', '.btn {\n  padding: 8px 16px;\n  background: #3b82f6;\n  color: #fff;\n  border-radius: 8px;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">.btn-style</button>
-              <button onclick="appendToSlot('merger-script2', 'body {\n  background-color: #030712;\n  color: #f8fafc;\n}\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-purple-600/30 text-purple-300 rounded font-mono border border-slate-800 shrink-0">body-theme</button>
-            </div>
-
-            <textarea id="merger-script2" rows="10" placeholder="/* Paste CSS Styling or Script 2 here */" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-purple-500 resize-none flex-1"></textarea>
-          </div>
-
-          <!-- SCRIPT 3 SLOT (JS) -->
-          <div class="glass-card p-3.5 rounded-2xl border border-slate-800 space-y-2.5 flex flex-col">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
-                <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">3</span>
-                <span>Script 3 (JS / Logic)</span>
-              </span>
-              <div class="flex items-center space-x-2">
-                <button onclick="clearMergerSlot('merger-script3')" class="text-[11px] text-rose-400 hover:underline">Clear</button>
-                <label class="cursor-pointer text-[11px] text-slate-400 hover:text-emerald-400 flex items-center space-x-1">
-                  <i data-lucide="upload" class="w-3 h-3"></i>
-                  <span>Upload File</span>
-                  <input type="file" accept=".js,.txt" class="hidden" onchange="handleScriptFileUpload(event, 'script3')" />
-                </label>
-              </div>
-            </div>
-
-            <!-- JS Slot Tag Helper Toolbar -->
-            <div class="bg-slate-950/80 border border-slate-800/80 rounded-lg p-1.5 flex items-center space-x-1 overflow-x-auto helper-scroll text-[11px]">
-              <span class="text-[10px] text-slate-500 font-mono px-1">Insert:</span>
-              <button onclick="appendToSlot('merger-script3', 'document.addEventListener(\'DOMContentLoaded\', () => {\n  console.log(\'Loaded!\');\n});\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">onLoad</button>
-              <button onclick="appendToSlot('merger-script3', 'fetch(\'https://api.example.com/data\')\n  .then(res => res.json())\n  .then(data => console.log(data));\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">fetch()</button>
-              <button onclick="appendToSlot('merger-script3', 'document.querySelector(\'.btn\').addEventListener(\'click\', () => {\n  alert(\'Clicked!\');\n});\n')" class="px-1.5 py-0.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-300 rounded font-mono border border-slate-800 shrink-0">onClick</button>
-            </div>
-
-            <textarea id="merger-script3" rows="10" placeholder="// Paste JavaScript Logic or Script 3 here" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-emerald-500 resize-none flex-1"></textarea>
-          </div>
-
-        </div>
-
-        <!-- Action Card: Merge Engine Trigger -->
-        <div class="glass-card p-5 rounded-2xl border border-purple-500/30 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-          <div class="space-y-1 text-center md:text-left">
-            <h3 class="text-sm font-bold text-white flex items-center justify-center md:justify-start space-x-2">
-              <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i>
-              <span>Bundle & Merge 3 Scripts</span>
-            </h3>
-            <p class="text-xs text-slate-400">Combines Script 1 (HTML), Script 2 (CSS), and Script 3 (JS) into one clean file and loads it into Editor & Live Preview.</p>
-          </div>
-
-          <div class="flex items-center space-x-2 w-full md:w-auto">
-            <button onclick="clearMergerSlots()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition">
-              Clear All Slots
-            </button>
-            <button onclick="executeScriptBundle()" class="px-6 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-500/25 flex items-center justify-center space-x-2 transition w-full md:w-auto shrink-0">
-              <i data-lucide="combine" class="w-4 h-4"></i>
-              <span>Bundle & Push to Editor</span>
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 3: LIVE PREVIEW & ERROR CONSOLE PANEL -->
-      <!-- ========================================== -->
-      <section id="view-preview" class="view-panel inactive h-full flex-col flex-1 p-2 md:p-4 space-y-2.5 pb-28 md:pb-4 overflow-y-auto">
-        
-        <!-- Preview Controls Toolbar -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center justify-between shrink-0">
-          
-          <!-- Viewport Mode Switcher -->
-          <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
-            <button onclick="setPreviewViewport('desktop')" id="vp-btn-desktop" class="px-2.5 py-1 rounded-md bg-blue-600 text-white font-medium flex items-center space-x-1 transition">
-              <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Desktop</span>
-            </button>
-            <button onclick="setPreviewViewport('tablet')" id="vp-btn-tablet" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition">
-              <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Tablet</span>
-            </button>
-            <button onclick="setPreviewViewport('mobile')" id="vp-btn-mobile" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition">
-              <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Mobile</span>
-            </button>
-          </div>
-
-          <!-- Status Address Pill -->
-          <div class="hidden md:flex items-center space-x-2 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1 text-xs text-slate-400 font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>https://preview.devdeploy.local</span>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex items-center space-x-1.5">
-            <button onclick="refreshLivePreview()" title="Refresh Preview" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">
-              <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-            </button>
-
-            <button onclick="openPreviewNewTab()" title="Open in New Window" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center space-x-1 transition">
-              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Pop Out</span>
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Interactive Frame Wrapper -->
-        <div class="flex-1 bg-slate-950/80 rounded-xl border border-slate-800/80 p-1.5 overflow-hidden flex items-center justify-center relative min-h-[300px]">
-          <iframe id="interactive-preview-frame" class="preview-desktop bg-white border-0 transition-all duration-300 shadow-2xl rounded-lg" sandbox="allow-scripts allow-modals"></iframe>
-        </div>
-
-        <!-- PREVIEW CONSOLE ERROR DETECTOR PANEL -->
-        <div class="glass-card rounded-xl border border-slate-800 p-3 space-y-2 shrink-0">
-          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
-            <div class="flex items-center space-x-2">
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
-              <span class="text-xs font-bold text-slate-200">Preview Console & Error Detector</span>
-              <span id="preview-error-count-badge" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold">0 Errors</span>
-            </div>
-            <button onclick="clearPreviewConsoleLogs()" class="text-xs text-slate-400 hover:text-slate-200">Clear Console</button>
-          </div>
-
-          <div id="preview-console-output" class="bg-slate-950 border border-slate-800/80 rounded-lg p-2.5 h-24 overflow-y-auto font-mono text-[11px] space-y-1">
-            <div class="text-slate-500 italic">[CONSOLE] Frame listener ready. JavaScript syntax or runtime errors in code will be logged here automatically.</div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 4: BRAND TEMPLATES LIBRARY            -->
-      <!-- ========================================== -->
-      <section id="view-templates" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 pb-28 md:pb-6">
-        
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
-              <i data-lucide="boxes" class="w-5 h-5 text-blue-400"></i>
-              <span>Brand Framework Templates</span>
-            </h1>
-            <p class="text-xs text-slate-400">Select a framework starter template to populate your editor workspace.</p>
-          </div>
-
-          <div class="flex items-center space-x-2 w-full md:w-auto">
-            <input type="text" id="template-search-input" onkeyup="filterTemplates()" placeholder="Search templates..." class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-full md:w-56" />
-          </div>
-        </div>
-
-        <!-- Template Cards Grid -->
-        <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Rendered Template Cards -->
-        </div>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 5: DEPLOYMENT HUB & TOKEN SETTINGS    -->
-      <!-- ========================================== -->
-      <section id="view-deploy" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-5xl mx-auto w-full pb-28 md:pb-6">
-        
-        <div>
-          <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
-            <i data-lucide="cloud-lightning" class="w-5 h-5 text-purple-400"></i>
-            <span>Cloud Deployment Hub</span>
-          </h1>
-          <p class="text-xs text-slate-400">Configure cloud providers, save bearer API tokens, and execute live web deployments.</p>
-        </div>
-
-        <!-- Deployment Target Cards -->
-        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
-          <label class="block text-xs font-semibold text-slate-300">Target Provider</label>
-          <div class="grid grid-cols-3 gap-3">
-            
-            <button onclick="setDeployTarget('vercel')" id="target-card-vercel" class="target-card p-4 rounded-xl border border-purple-500 bg-purple-500/10 flex flex-col items-center justify-center space-y-2 text-white transition">
-              <i data-lucide="triangle" class="w-6 h-6 fill-current"></i>
-              <span class="text-xs font-bold">Vercel</span>
-            </button>
-
-            <button onclick="setDeployTarget('github')" id="target-card-github" class="target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition">
-              <i data-lucide="github" class="w-6 h-6"></i>
-              <span class="text-xs font-bold">GitHub Pages</span>
-            </button>
-
-            <button onclick="setDeployTarget('netlify')" id="target-card-netlify" class="target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition">
-              <i data-lucide="globe" class="w-6 h-6"></i>
-              <span class="text-xs font-bold">Netlify</span>
-            </button>
-
-          </div>
-        </div>
-
-        <!-- Configuration Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
-            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Project Settings</h3>
-            
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">Project Name</label>
-              <input type="text" id="deploy-proj-name" value="my-awesome-app" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
-            </div>
-
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">Access Visibility</label>
-              <select id="deploy-visibility" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500">
-                <option value="public">Public Site</option>
-                <option value="private">Private Site</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
-            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Saved API Tokens</h3>
-
-            <div class="space-y-1">
-              <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>GitHub Access Token</span>
-                <span id="badge-token-github" class="text-[10px] text-amber-400">Unset</span>
-              </label>
-              <input type="password" id="input-token-github" placeholder="ghp_xxxxxxxxxxxxxxxx" onchange="saveToken('github')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
-            </div>
-
-            <div class="space-y-1">
-              <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>Vercel Bearer Token</span>
-                <span id="badge-token-vercel" class="text-[10px] text-amber-400">Unset</span>
-              </label>
-              <input type="password" id="input-token-vercel" placeholder="Bearer Token..." onchange="saveToken('vercel')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
-            </div>
-
-            <div class="space-y-1">
-              <label class="block text-xs text-slate-400 flex items-center justify-between">
-                <span>Netlify Token</span>
-                <span id="badge-token-netlify" class="text-[10px] text-amber-400">Unset</span>
-              </label>
-              <input type="password" id="input-token-netlify" placeholder="nfp_xxxxxxxxxxxxxxxx" onchange="saveToken('netlify')" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500" />
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Deploy Trigger Button -->
-        <div class="glass-card p-6 rounded-2xl border border-purple-500/30 flex flex-col items-center text-center space-y-4">
-          <div class="space-y-1">
-            <h2 class="text-base font-bold text-white">Execute Deployment</h2>
-            <p class="text-xs text-slate-400">Packages code from workspace and triggers deployment on <span id="target-display-label" class="text-purple-400 font-bold">VERCEL</span>.</p>
-          </div>
-
-          <button onclick="triggerDeployment()" class="w-full max-w-md py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-purple-500/25 flex items-center justify-center space-x-2 transition">
-            <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-            <span>Start Cloud Build & Deploy</span>
-          </button>
-        </div>
-
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 6: AI SCRIPT & GAME GENERATOR         -->
-      <!-- ========================================== -->
-      <section id="view-ai" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 overflow-y-auto space-y-6 pb-28 md:pb-6">
-        
-        <div>
-          <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
-            <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
-            <span>AI Script & Game Generator Engine</span>
-          </h1>
-          <p class="text-xs text-slate-400">Ask the AI to generate games, web apps, or refactor text into technical English. Works live or via built-in AI Engine!</p>
-        </div>
-
-        <!-- Gemini API Key Input Banner -->
-        <div class="glass-card p-3.5 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="key" class="w-4 h-4 text-amber-400 shrink-0"></i>
-            <div>
-              <span class="text-xs font-bold text-slate-200">Gemini API Key (Optional)</span>
-              <p class="text-[11px] text-slate-400">If unset, DevDeploy's Built-in Smart AI Engine handles requests automatically!</p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <input type="password" id="ai-api-key-input" placeholder="AIzaSy..." onchange="saveGeminiKey()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500 w-full sm:w-64" />
-            <button onclick="saveGeminiKey()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition shrink-0">Save Key</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-slate-300">Input Prompt / Text / Request</label>
-              <button onclick="importActiveFileToAI()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
-                <i data-lucide="file-input" class="w-3.5 h-3.5"></i>
-                <span>Load from Editor</span>
-              </button>
-            </div>
-
-            <textarea id="ai-input-box" rows="10" placeholder="e.g. 'Buat Script html game', 'Buat kalkulator', or paste text to translate to technical English..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 resize-none flex-1"></textarea>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button onclick="runAIOptimizer('generate')" class="py-2.5 bg-gradient-to-r from-amber-500 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-1 transition col-span-2 sm:col-span-1">
-                <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-                <span>Generate App</span>
-              </button>
-              <button onclick="runAIOptimizer('english')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
-                <i data-lucide="languages" class="w-3.5 h-3.5"></i>
-                <span>Polish English</span>
-              </button>
-              <button onclick="runAIOptimizer('readme')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
-                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                <span>README</span>
-              </button>
-              <button onclick="runAIOptimizer('refactor')" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs rounded-xl font-medium flex items-center justify-center space-x-1 transition">
-                <i data-lucide="code" class="w-3.5 h-3.5"></i>
-                <span>Refactor</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-amber-400 flex items-center space-x-1">
-                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>AI Generated Result</span>
-              </label>
-              
-              <div class="flex items-center space-x-2">
-                <button onclick="copyAIOutput()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg transition">
-                  Copy Result
-                </button>
-                <button onclick="applyAIToActiveFile()" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-2.5 py-1 rounded-lg transition">
-                  Push to Editor & Run
-                </button>
-              </div>
-            </div>
-
-            <div id="ai-output-box" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 overflow-y-auto flex-1 min-h-[250px] whitespace-pre-wrap">
-              <span class="text-slate-600 italic">Generated app code or translated text will appear here...</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- VIEW 7: TERMINAL CONSOLE & LOGS            -->
-      <!-- ========================================== -->
-      <section id="view-logs" class="view-panel inactive h-full flex-col flex-1 p-4 md:p-6 space-y-4 pb-28 md:pb-6">
-        
-        <div class="flex items-center justify-between shrink-0">
-          <div>
-            <h1 class="text-base md:text-lg font-bold text-slate-100 flex items-center space-x-2">
-              <i data-lucide="terminal" class="w-5 h-5 text-emerald-400"></i>
-              <span>Terminal & Build Logs</span>
-            </h1>
-            <p class="text-xs text-slate-400">Live request tracing, build stderr output, and cloud API logs.</p>
-          </div>
-
-          <div class="flex items-center space-x-2">
-            <button onclick="downloadTerminalLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-xl flex items-center space-x-1 transition">
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span>Export</span>
-            </button>
-            <button onclick="clearTerminalLogs()" class="px-3 py-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs rounded-xl transition">
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <div id="terminal-console-output" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-y-auto space-y-1 text-slate-300 min-h-[300px]">
-          <div class="text-slate-600">[SYSTEM] DevDeploy Studio ULTRA Engine v4.6 Ready.</div>
-          <div class="text-emerald-400">[MODULE] Multi-Language Core Initialized (Python, Lua, Java, Shell, HTML/JS/CSS).</div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <nav class="md:hidden h-16 border-t border-slate-800/80 bg-slate-950/95 backdrop-blur-md px-2 flex items-center justify-around fixed bottom-0 left-0 right-0 z-40 shrink-0">
-    
-    <button onclick="switchView('editor')" id="nav-mobile-editor" class="flex flex-col items-center justify-center w-12 py-1 text-blue-400">
-      <i data-lucide="file-code" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">Editor</span>
-    </button>
-
-    <button onclick="switchView('merger')" id="nav-mobile-merger" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="combine" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">Merger</span>
-    </button>
-
-    <button onclick="switchView('preview')" id="nav-mobile-preview" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="play-circle" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">Preview</span>
-    </button>
-
-    <button onclick="switchView('deploy')" id="nav-mobile-deploy" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">Deploy</span>
-    </button>
-
-    <button onclick="switchView('ai')" id="nav-mobile-ai" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="sparkles" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">AI</span>
-    </button>
-
-    <button onclick="switchView('logs')" id="nav-mobile-logs" class="flex flex-col items-center justify-center w-12 py-1 text-slate-400">
-      <i data-lucide="terminal" class="w-4 h-4"></i>
-      <span class="text-[9px] mt-1 font-medium">Logs</span>
-    </button>
-
-  </nav>
-
-  <!-- DRAWER MODAL: SCRIPT TAG CHEAT SHEET -->
-  <div id="drawer-tag-helper" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-card w-full max-w-2xl max-h-[85vh] p-6 rounded-2xl border border-slate-800 space-y-4 flex flex-col">
-      
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
-        <h3 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
-          <i data-lucide="code" class="w-4 h-4 text-purple-400"></i>
-          <span>Script Tag Helper Cheat Sheet</span>
-        </h3>
-        <button onclick="toggleHelperDrawer()" class="text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="overflow-y-auto space-y-4 flex-1 pr-1 text-xs">
-        
-        <!-- HTML Section -->
-        <div class="space-y-2">
-          <h4 class="font-bold text-blue-400 uppercase tracking-wider text-[11px]">HTML Tags Helper</h4>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <button onclick="insertHelperFromDrawer('<h1>Header 1</h1>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;h1&gt;</div>
-              <div class="text-[10px] text-slate-400">Main title header</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('<p>Text content...</p>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;p&gt;</div>
-              <div class="text-[10px] text-slate-400">Paragraph text tag</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('<button class=\'btn\'>Button</button>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;button&gt;</div>
-              <div class="text-[10px] text-slate-400">Interactive button tag</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('<input type=\'text\' placeholder=\'Input...\' />')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;input&gt;</div>
-              <div class="text-[10px] text-slate-400">Text input field</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('<img src=\'https://placehold.co/300x200/1e293b/white?text=Image\' />')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;img&gt;</div>
-              <div class="text-[10px] text-slate-400">Image element</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('<script src=\'https://cdn.tailwindcss.com\'><\/script>')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-blue-500 transition">
-              <div class="font-mono text-blue-300 font-bold">&lt;script CDN&gt;</div>
-              <div class="text-[10px] text-slate-400">Tailwind script tag</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- JS Section -->
-        <div class="space-y-2">
-          <h4 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">JavaScript Helpers</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button onclick="insertHelperFromDrawer('fetch(\'https://api.example.com/data\').then(r => r.json()).then(console.log);')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-emerald-500 transition">
-              <div class="font-mono text-emerald-300 font-bold">fetch() API</div>
-              <div class="text-[10px] text-slate-400">HTTP REST request fetcher</div>
-            </button>
-            <button onclick="insertHelperFromDrawer('document.querySelector(\'#btn\').addEventListener(\'click\', () => {});')" class="p-2 bg-slate-900 border border-slate-800 rounded-lg text-left hover:border-emerald-500 transition">
-              <div class="font-mono text-emerald-300 font-bold">addEventListener()</div>
-              <div class="text-[10px] text-slate-400">Event click listener binding</div>
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
-
-  <!-- APPLICATION ENGINE SCRIPT -->
-  <script>
-    // Global State
-    let currentView = 'editor';
-    let activeDeployTarget = 'vercel';
-    let monacoEditor = null;
-    let activeFileKey = 'index.html';
-    let previewErrorCount = 0;
-
-    // Workspace State
-    let workspaceFiles = {
-      'index.html': {
-        name: 'index.html',
-        language: 'html',
-        content: ``
-      }
-    };
-
-    // Helper Buttons Map Based on Language
-    const helperToolbars = {
-      'html': `
-        <button onclick="insertSnippetToEditor('<h1>Title Header</h1>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;h1&gt;</button>
-        <button onclick="insertSnippetToEditor('<p>Paragraph text description...</p>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;p&gt;</button>
-        <button onclick="insertSnippetToEditor('<button class=\\'btn\\'>Click Me</button>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;button&gt;</button>
-        <button onclick="insertSnippetToEditor('<input type=\\'text\\' placeholder=\\'Enter value...\\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;input&gt;</button>
-        <button onclick="insertSnippetToEditor('<img src=\\'https://placehold.co/300x200/1e293b/white?text=Sample+Image\\' alt=\\'Image\\' />')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;img&gt;</button>
-        <button onclick="insertSnippetToEditor('<div class=\\'container\\'>\\n  \\n</div>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">&lt;div&gt;</button>
-      `,
-      'javascript': `
-        <button onclick="insertSnippetToEditor('console.log(\\'Debug info:\\', data);')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">console.log()</button>
-        <button onclick="insertSnippetToEditor('document.querySelector(\\'#id\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">querySelector</button>
-        <button onclick="insertSnippetToEditor('fetch(\\'https://api.example.com/data\\')\\n  .then(res => res.json())\\n  .then(data => console.log(data));')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">fetch()</button>
-        <button onclick="insertSnippetToEditor('const myFunction = async () => {\\n  \\n};')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">async () =></button>
-      `,
-      'css': `
-        <button onclick="insertSnippetToEditor('.flex-center {\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">.flex-center</button>
-        <button onclick="insertSnippetToEditor('@media (max-width: 768px) {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">@media mobile</button>
-      `,
-      'python': `
-        <button onclick="insertSnippetToEditor('print(\\'Hello World\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">print()</button>
-        <button onclick="insertSnippetToEditor('def my_function():\\n    pass')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">def func()</button>
-        <button onclick="insertSnippetToEditor('if __name__ == \\'__main__\\':\\n    ')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">if __main__</button>
-        <button onclick="insertSnippetToEditor('import sys\\nimport os')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">import sys</button>
-      `,
-      'lua': `
-        <button onclick="insertSnippetToEditor('print(\\'Hello Lua\\')')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">print()</button>
-        <button onclick="insertSnippetToEditor('local function myFunc()\\n  \\nend')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">local function</button>
-        <button onclick="insertSnippetToEditor('for i=1, 10 do\\n  print(i)\\nend')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">for loop</button>
-      `,
-      'java': `
-        <button onclick="insertSnippetToEditor('System.out.println(\\'Hello Java\\');')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">sout</button>
-        <button onclick="insertSnippetToEditor('public static void main(String[] args) {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">psvm</button>
-        <button onclick="insertSnippetToEditor('public class Main {\\n  \\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">public class</button>
-      `,
-      'cpp': `
-        <button onclick="insertSnippetToEditor('std::cout << \\'Hello C++\\' << std::endl;')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">std::cout</button>
-        <button onclick="insertSnippetToEditor('#include <iostream>\\n#include <vector>')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">#include</button>
-        <button onclick="insertSnippetToEditor('int main() {\\n  return 0;\\n}')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">int main()</button>
-      `,
-      'shell': `
-        <button onclick="insertSnippetToEditor('echo \\'Hello Linux\\'')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">echo</button>
-        <button onclick="insertSnippetToEditor('#!/bin/bash\\n')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">#!/bin/bash</button>
-        <button onclick="insertSnippetToEditor('chmod +x script.sh')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">chmod +x</button>
-        <button onclick="insertSnippetToEditor('ls -la')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600/30 border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 rounded text-xs font-mono transition shrink-0">ls -la</button>
-      `
-    };
-
-    // Framework Catalog
-    let templateCatalog = [
-      {
-        id: 'tpl-space-shooter',
-        name: 'Space Arcade Shooter Game',
-        category: 'games',
-        brand: 'HTML5 Game',
-        description: 'Complete playable HTML5 Canvas Arcade Space Shooter with score, controls, and sound.',
-        language: 'html',
-        code: `<!DOCTYPE html>
+    </nav>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // --- STATE ---
+        let editorInstance = null;
+        let activeLang = 'html';
+        const fileContent = { html: '', css: '', javascript: '', python: '', lua: '', java: '', cpp: '', shell: '' };
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initMonaco();
+            updateHelperToolbar('html');
+            setupIframeListener();
+        });
+
+        // --- MENU LOGIC ---
+        function switchMenu(menuId) {
+            document.querySelectorAll('.view-panel').forEach(el => {
+                el.classList.remove('active');
+                el.style.pointerEvents = 'none';
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-purple', 'bg-brand-purple/10', 'border-brand-purple/20');
+                if(!btn.id.includes('desktop')) btn.classList.add('text-slate-400');
+            });
+
+            const activePanel = document.getElementById(`view-${menuId}`);
+            activePanel.classList.add('active');
+            activePanel.style.pointerEvents = 'auto';
+
+            const dBtn = document.getElementById(`nav-desktop-${menuId}`);
+            if(dBtn) {
+                dBtn.classList.add('text-brand-purple', 'bg-brand-purple/10', 'border-brand-purple/20');
+                dBtn.classList.remove('border-transparent', 'text-slate-400');
+            }
+            const mBtn = document.getElementById(`nav-mobile-${menuId}`);
+            if(mBtn) {
+                mBtn.classList.add('text-brand-purple');
+                mBtn.classList.remove('text-slate-400');
+            }
+
+            if(menuId === 'editor' && editorInstance) {
+                setTimeout(() => editorInstance.layout(), 50);
+            }
+            if(menuId === 'preview') {
+                refreshPreview();
+            }
+        }
+
+        // --- MONACO EDITOR ---
+        function initMonaco() {
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' }});
+            require(['vs/editor/editor.main'], function() {
+                document.getElementById('monaco-loading').style.display = 'none';
+                editorInstance = monaco.editor.create(document.getElementById('monaco-container'), {
+                    value: '<!DOCTYPE html>\n<html>\n<head>\n  <title>App</title>\n</head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>',
+                    language: 'html',
+                    theme: 'vs-dark',
+                    automaticLayout: true,
+                    minimap: { enabled: false },
+                    fontSize: 13,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    padding: { top: 16 }
+                });
+
+                editorInstance.onDidChangeModelContent(() => {
+                    fileContent[activeLang] = editorInstance.getValue();
+                });
+                fileContent['html'] = editorInstance.getValue();
+            });
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('editor-lang').value;
+            activeLang = lang;
+            if(editorInstance) {
+                monaco.editor.setModelLanguage(editorInstance.getModel(), lang);
+                editorInstance.setValue(fileContent[lang] || '');
+            }
+            updateHelperToolbar(lang);
+            showToast(`Language switched to ${lang.toUpperCase()}`);
+        }
+
+        function clearEditor() {
+            if(editorInstance) {
+                editorInstance.setValue('');
+                fileContent[activeLang] = '';
+                showToast("Editor cleared.");
+            }
+        }
+
+        // --- TAG HELPER LOGIC ---
+        const helperSnippets = {
+            html: [
+                { l: '<h1>', c: '<h1>Heading</h1>\n' },
+                { l: '<button>', c: '<button id="btn">Click</button>\n' },
+                { l: '<div>', c: '<div class="container">\n\n</div>\n' },
+                { l: 'Tailwind', c: '<script src="https://cdn.tailwindcss.com"><\/script>\n' }
+            ],
+            javascript: [
+                { l: 'console.log', c: 'console.log("Debug data");\n' },
+                { l: 'document.get', c: 'document.getElementById("id")' },
+                { l: 'addEventListener', c: 'btn.addEventListener("click", function() {\n  \n});\n' }
+            ],
+            css: [ { l: '.flex-center', c: '.flex-center {\n display: flex;\n justify-content: center;\n align-items: center;\n}\n' } ],
+            python: [ { l: 'print()', c: 'print("Hello Python")\n' }, { l: 'def func()', c: 'def my_func():\n    pass\n' } ],
+            lua: [ { l: 'print()', c: 'print("Hello Lua")\n' }, { l: 'local function', c: 'local function do_work()\n\nend\n' } ],
+            java: [ { l: 'sout', c: 'System.out.println("Hello Java");\n' }, { l: 'main()', c: 'public static void main(String[] args) {\n\n}\n' } ],
+            cpp: [ { l: 'cout', c: 'std::cout << "Hello C++" << std::endl;\n' } ],
+            shell: [ { l: 'echo', c: 'echo "Hello Linux Shell"\n' } ]
+        };
+
+        function updateHelperToolbar(lang) {
+            const tb = document.getElementById('tag-helper-toolbar');
+            tb.innerHTML = '';
+            const list = helperSnippets[lang] || helperSnippets.javascript;
+            list.forEach(item => {
+                const b = document.createElement('button');
+                b.className = 'px-2 py-1 bg-slate-800 hover:bg-brand-purple/30 border border-slate-700 hover:border-brand-purple/50 text-slate-300 rounded text-[10px] font-mono whitespace-nowrap transition';
+                b.innerText = item.l;
+                b.onclick = () => insertToEditor(item.c);
+                tb.appendChild(b);
+            });
+        }
+
+        function insertToEditor(code) {
+            if(!editorInstance) return;
+            const pos = editorInstance.getPosition();
+            editorInstance.executeEdits("helper", [{
+                range: new monaco.Range(pos.lineNumber, pos.column, pos.lineNumber, pos.column),
+                text: code,
+                forceMoveMarkers: true
+            }]);
+            editorInstance.focus();
+        }
+
+        // --- 5-SLOT MERGER ---
+        function bundleMerger() {
+            const h = document.getElementById('m-slot1').value;
+            const cdn = document.getElementById('m-slot2').value;
+            const css = document.getElementById('m-slot3').value;
+            const body = document.getElementById('m-slot4').value;
+            const js = document.getElementById('m-slot5').value;
+
+            const finalHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Space Shooter Arcade</title>
-  <style>
-    body { margin: 0; background: #030712; color: #fff; font-family: sans-serif; display: flex; flex-col; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-    canvas { background: #0b1120; border: 2px solid #3b82f6; border-radius: 12px; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
-    .hud { position: absolute; top: 20px; font-size: 18px; font-weight: bold; color: #38bdf8; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    ${h}
+    ${cdn}
+    <style>
+${css}
+    </style>
 </head>
 <body>
-  <div class="hud">Score: <span id="score">0</span></div>
-  <canvas id="gameCanvas" width="400" height="500"></canvas>
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    let score = 0;
-    let player = { x: 180, y: 440, w: 40, h: 20, speed: 6 };
-    let bullets = [], enemies = [], keys = {};
-
-    window.addEventListener('keydown', e => keys[e.key] = true);
-    window.addEventListener('keyup', e => keys[e.key] = false);
-
-    function spawnEnemy() {
-      enemies.push({ x: Math.random() * 360, y: -20, w: 30, h: 30, speed: 2 + Math.random() * 2 });
-    }
-
-    setInterval(spawnEnemy, 1000);
-
-    function update() {
-      if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
-      if (keys['ArrowRight'] && player.x < canvas.width - player.w) player.x += player.speed;
-      if (keys[' '] && bullets.length < 5) {
-        bullets.push({ x: player.x + player.w/2 - 2, y: player.y, w: 4, h: 10 });
-        keys[' '] = false;
-      }
-
-      bullets.forEach((b, i) => {
-        b.y -= 8;
-        if (b.y < 0) bullets.splice(i, 1);
-      });
-
-      enemies.forEach((e, ei) => {
-        e.y += e.speed;
-        bullets.forEach((b, bi) => {
-          if (b.x < e.x + e.w && b.x + b.w > e.x && b.y < e.y + e.h && b.y + b.h > e.y) {
-            enemies.splice(ei, 1);
-            bullets.splice(bi, 1);
-            score += 10;
-            document.getElementById('score').innerText = score;
-          }
-        });
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#38bdf8';
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-
-      ctx.fillStyle = '#f43f5e';
-      bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
-
-      ctx.fillStyle = '#a855f7';
-      enemies.forEach(e => ctx.fillRect(e.x, e.y, e.w, e.h));
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-    loop();
-  <\/script>
-</body>
-</html>`
-      },
-      {
-        id: 'tpl-react-tailwind',
-        name: 'React 18 + Tailwind',
-        category: 'frontend',
-        brand: 'React.js',
-        description: 'Single-page React app with Tailwind CSS styling.',
-        language: 'html',
-        code: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>React + Tailwind App</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    function App() {
-      const [count, setCount] = React.useState(0);
-      return (
-        <div className="p-8 max-w-sm bg-slate-900 border border-slate-800 rounded-2xl shadow-xl text-center space-y-4">
-          <div className="w-12 h-12 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-xl flex items-center justify-center mx-auto text-xl">
-            ⚛️
-          </div>
-          <h1 className="text-xl font-bold text-sky-400">React + Tailwind</h1>
-          <p className="text-xs text-slate-400">Interactive component running live inside DevDeploy Studio ULTRA.</p>
-          <button onClick={() => setCount(c => c + 1)} className="px-4 py-2 bg-sky-600 hover:bg-sky-500 rounded-xl font-medium text-xs text-white transition">
-            Counter: {count}
-          </button>
-        </div>
-      );
-    }
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  <\/script>
-</body>
-</html>`
-      }
-    ];
-
-    // Initialization
-    window.onload = function() {
-      lucide.createIcons();
-      initMonacoEditor();
-      renderFileTabs();
-      renderTemplatesGrid();
-      loadTokensFromStorage();
-      loadGeminiKey();
-      checkEmptyWorkspaceStatus();
-      setupFrameMessageListener();
-      refreshLivePreview();
-      updateHelperToolbar('html');
-    };
-
-    // UPDATE HELPER TOOLBAR BASED ON LANGUAGE
-    function updateHelperToolbar(lang) {
-      const container = document.getElementById('dynamic-helper-toolbar');
-      if (!container) return;
-      container.innerHTML = helperToolbars[lang] || helperToolbars['javascript'];
-    }
-
-    // CHANGE FILE LANGUAGE (Dropdown)
-    function changeActiveFileLanguage(lang) {
-      if (workspaceFiles[activeFileKey]) {
-        workspaceFiles[activeFileKey].language = lang;
-        if (monacoEditor) monaco.editor.setModelLanguage(monacoEditor.getModel(), lang);
-        document.getElementById('active-lang-badge').innerText = lang.toUpperCase();
-        updateHelperToolbar(lang);
-      }
-    }
-
-    // VIEW SWITCHING ENGINE
-    function switchView(viewId) {
-      document.querySelectorAll('.view-panel').forEach(panel => {
-        panel.classList.remove('active');
-        panel.classList.add('inactive');
-      });
-
-      ['editor', 'merger', 'preview', 'templates', 'deploy', 'ai', 'logs'].forEach(v => {
-        const dBtn = document.getElementById(`nav-desktop-${v}`);
-        const mBtn = document.getElementById(`nav-mobile-${v}`);
-
-        if (v === viewId) {
-          dBtn?.classList.add('text-blue-400', 'bg-blue-500/10', 'border', 'border-blue-500/20');
-          dBtn?.classList.remove('text-slate-400');
-          
-          mBtn?.classList.add('text-blue-400');
-          mBtn?.classList.remove('text-slate-400');
-        } else {
-          dBtn?.classList.remove('text-blue-400', 'bg-blue-500/10', 'border', 'border-blue-500/20');
-          dBtn?.classList.add('text-slate-400');
-
-          mBtn?.classList.remove('text-blue-400');
-          mBtn?.classList.add('text-slate-400');
-        }
-      });
-
-      currentView = viewId;
-      const newEl = document.getElementById(`view-${viewId}`);
-      if (newEl) {
-        newEl.classList.remove('inactive');
-        newEl.classList.add('active');
-      }
-
-      if (viewId === 'editor' && monacoEditor) {
-        setTimeout(() => monacoEditor.layout(), 100);
-      } else if (viewId === 'preview') {
-        refreshLivePreview();
-      }
-    }
-
-    // MONACO EDITOR ENGINE
-    function initMonacoEditor() {
-      require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs' } });
-      require(['vs/editor/editor.main'], function () {
-        monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
-          value: workspaceFiles[activeFileKey].content,
-          language: workspaceFiles[activeFileKey].language,
-          theme: 'vs-dark',
-          automaticLayout: true,
-          fontSize: 13,
-          fontFamily: 'JetBrains Mono, Monaco, monospace',
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          padding: { top: 12, bottom: 12 }
-        });
-
-        monacoEditor.onDidChangeModelContent(() => {
-          if (workspaceFiles[activeFileKey]) {
-            workspaceFiles[activeFileKey].content = monacoEditor.getValue();
-            updateCharCount();
-            checkEmptyWorkspaceStatus();
-          }
-        });
-
-        updateCharCount();
-      });
-    }
-
-    // PREVIEW FRAME & ERROR DETECTOR ENGINE
-    function refreshLivePreview() {
-      const frame = document.getElementById('interactive-preview-frame');
-      if (!frame) return;
-
-      const codeToRender = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
-      
-      if (!codeToRender.trim()) {
-        frame.srcdoc = `<html><body style="background:#030712;color:#64748b;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Workspace is empty. Add HTML/JS/CSS code to preview live.</p></body></html>`;
-        return;
-      }
-
-      // Inject Error Capture Listener Script
-      const captureScript = `
-        <script>
-          window.onerror = function(msg, url, lineNo, columnNo, error) {
-            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'error', message: 'Uncaught Error: ' + msg + ' (Line ' + lineNo + ')' }, '*');
-            return false;
-          };
-          const origConsoleError = console.error;
-          console.error = function(...args) {
-            origConsoleError.apply(console, args);
-            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'error', message: args.join(' ') }, '*');
-          };
-          const origConsoleWarn = console.warn;
-          console.warn = function(...args) {
-            origConsoleWarn.apply(console, args);
-            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'warn', message: args.join(' ') }, '*');
-          };
-          const origConsoleLog = console.log;
-          console.log = function(...args) {
-            origConsoleLog.apply(console, args);
-            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', level: 'info', message: args.join(' ') }, '*');
-          };
-        <\/script>
-      `;
-
-      let finalHtml = codeToRender;
-      if (finalHtml.includes('<head>')) {
-        finalHtml = finalHtml.replace('<head>', '<head>' + captureScript);
-      } else {
-        finalHtml = captureScript + finalHtml;
-      }
-
-      frame.srcdoc = finalHtml;
-      logTerminal('INFO', 'Live Preview frame reloaded.');
-    }
-
-    function setupFrameMessageListener() {
-      window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'PREVIEW_CONSOLE_LOG') {
-          const { level, message } = event.data;
-          const consoleEl = document.getElementById('preview-console-output');
-          if (!consoleEl) return;
-
-          let badgeClass = 'text-slate-300';
-          if (level === 'error') {
-            badgeClass = 'text-rose-400 font-bold';
-            previewErrorCount++;
-            updatePreviewErrorBadge();
-          } else if (level === 'warn') {
-            badgeClass = 'text-amber-400';
-          }
-
-          const line = `<div><span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span> <span class="${badgeClass}">[${level.toUpperCase()}] ${message}</span></div>`;
-          consoleEl.innerHTML += line;
-          consoleEl.scrollTop = consoleEl.scrollHeight;
-        }
-      });
-    }
-
-    function updatePreviewErrorBadge() {
-      const badge = document.getElementById('preview-error-count-badge');
-      if (!badge) return;
-
-      if (previewErrorCount > 0) {
-        badge.innerText = `${previewErrorCount} Error(s) Found`;
-        badge.className = "text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full font-mono font-bold animate-pulse";
-      } else {
-        badge.innerText = `0 Errors`;
-        badge.className = "text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold";
-      }
-    }
-
-    function clearPreviewConsoleLogs() {
-      previewErrorCount = 0;
-      updatePreviewErrorBadge();
-      const consoleEl = document.getElementById('preview-console-output');
-      if (consoleEl) consoleEl.innerHTML = '<div class="text-slate-500 italic">[CONSOLE] Console cleared. Listening for new outputs...</div>';
-    }
-
-    function setPreviewViewport(mode) {
-      const frame = document.getElementById('interactive-preview-frame');
-      if (!frame) return;
-
-      ['desktop', 'tablet', 'mobile'].forEach(m => {
-        const btn = document.getElementById(`vp-btn-${m}`);
-        if (m === mode) {
-          btn.className = "px-2.5 py-1 rounded-md bg-blue-600 text-white font-medium flex items-center space-x-1 transition";
-        } else {
-          btn.className = "px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium flex items-center space-x-1 transition";
-        }
-      });
-
-      frame.className = `preview-${mode} bg-white border-0 transition-all duration-300 shadow-2xl rounded-lg`;
-    }
-
-    function openPreviewNewTab() {
-      const content = workspaceFiles['index.html'] ? workspaceFiles['index.html'].content : '';
-      const win = window.open();
-      if (win) {
-        win.document.write(content);
-        win.document.close();
-      }
-    }
-
-    // AI ASSISTANT & GAME/APP GENERATOR ENGINE
-    function saveGeminiKey() {
-      const key = document.getElementById('ai-api-key-input').value.trim();
-      localStorage.setItem('gemini_api_key', key);
-      showToast(key ? "Gemini API Key saved!" : "Using Smart Offline AI Generator Mode", "info");
-    }
-
-    function loadGeminiKey() {
-      const key = localStorage.getItem('gemini_api_key') || '';
-      const input = document.getElementById('ai-api-key-input');
-      if (input) input.value = key;
-    }
-
-    async function runAIOptimizer(mode) {
-      const input = document.getElementById('ai-input-box').value.trim();
-      if (!input) {
-        showToast("Please enter prompt request or text.", "warn");
-        return;
-      }
-
-      const out = document.getElementById('ai-output-box');
-      out.innerText = "Processing request with DevDeploy AI Engine...";
-
-      const userKey = document.getElementById('ai-api-key-input')?.value.trim() || localStorage.getItem('gemini_api_key') || '';
-
-      if (userKey) {
-        try {
-          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userKey}`;
-
-          let promptText = `Translate all comments and documentation in the following code into professional technical English:\n\n${input}`;
-          if (mode === 'readme') promptText = `Generate a modern Markdown README.md file in English for the following project/code:\n\n${input}`;
-          if (mode === 'refactor') promptText = `Refactor the following code to make it clean, functional, and well-commented in technical English:\n\n${input}`;
-          if (mode === 'generate') promptText = `Write a single-file runnable HTML5 app/game for the following prompt: "${input}". Output raw code directly.`;
-
-          const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
-          });
-
-          if (!res.ok) throw new Error(`API HTTP ${res.status}`);
-
-          const data = await res.json();
-          const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-          if (resultText) {
-            out.innerText = resultText;
-            showToast("Generated via Gemini AI!", "success");
-            logTerminal('SUCCESS', `AI response generated via Gemini (${mode} mode).`);
-            return;
-          }
-        } catch (err) {
-          logTerminal('WARN', `Gemini API call failed (${err.message}). Using Smart AI Generator fallback.`);
-        }
-      }
-
-      // BUILT-IN SMART AI GENERATOR ENGINE FALLBACK
-      setTimeout(() => {
-        let generatedResult = "";
-        const lowerInput = input.toLowerCase();
-
-        if (mode === 'generate' || lowerInput.includes('game') || lowerInput.includes('script html') || lowerInput.includes('main') || lowerInput.includes('kalkulator') || lowerInput.includes('landing')) {
-          if (lowerInput.includes('game') || lowerInput.includes('main') || lowerInput.includes('play')) {
-            generatedResult = generatePlayableGameScript();
-          } else if (lowerInput.includes('kalkulator') || lowerInput.includes('calculator')) {
-            generatedResult = generateCalculatorScript();
-          } else {
-            generatedResult = generateLandingPageScript();
-          }
-        } else if (mode === 'english') {
-          generatedResult = generateOfflineEnglishTranslation(input);
-        } else if (mode === 'readme') {
-          generatedResult = generateOfflineReadme(input);
-        } else if (mode === 'refactor') {
-          generatedResult = generateOfflineRefactor(input);
-        } else {
-          generatedResult = `/* Technical English Refactoring Output */\n\n${input}\n\n// Processed and structured by DevDeploy Engine.`;
-        }
-
-        out.innerText = generatedResult;
-        showToast("Generated code via DevDeploy Built-in AI Engine!", "success");
-        logTerminal('SUCCESS', `Generated output using Built-in AI Engine.`);
-      }, 300);
-    }
-
-    function generatePlayableGameScript() {
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Space Star Catcher Game</title>
-  <style>
-    body { margin: 0; background: #030712; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
-    canvas { background: #0b1120; border: 2px solid #a855f7; border-radius: 16px; box-shadow: 0 0 25px rgba(168,85,247,0.4); }
-    .hud { font-size: 20px; font-weight: bold; color: #c084fc; margin-bottom: 12px; }
-  </style>
-</head>
-<body>
-  <div class="hud">Score: <span id="score">0</span></div>
-  <canvas id="game" width="400" height="450"></canvas>
-  <script>
-    const cvs = document.getElementById('game');
-    const ctx = cvs.getContext('2d');
-    let score = 0;
-    let p = { x: 180, y: 390, w: 50, h: 12, speed: 7 };
-    let stars = [];
-
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft' && p.x > 0) p.x -= p.speed * 2;
-      if (e.key === 'ArrowRight' && p.x < cvs.width - p.w) p.x += p.speed * 2;
-    });
-
-    setInterval(() => {
-      stars.push({ x: Math.random() * (cvs.width - 20), y: 0, size: 14, speed: 2 + Math.random() * 3 });
-    }, 800);
-
-    function update() {
-      stars.forEach((s, i) => {
-        s.y += s.speed;
-        if (s.y + s.size >= p.y && s.x + s.size >= p.x && s.x <= p.x + p.w) {
-          stars.splice(i, 1);
-          score += 10;
-          document.getElementById('score').innerText = score;
-        } else if (s.y > cvs.height) {
-          stars.splice(i, 1);
-        }
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-      ctx.fillStyle = '#a855f7';
-      ctx.fillRect(p.x, p.y, p.w, p.h);
-
-      ctx.fillStyle = '#facc15';
-      stars.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size/2, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-    loop();
-  <\/script>
+${body}
+    <script>
+${js}
+    <\/script>
 </body>
 </html>`;
-    }
+            
+            document.getElementById('editor-lang').value = 'html';
+            changeLanguage();
+            if(editorInstance) editorInstance.setValue(finalHTML);
+            
+            showToast("Successfully bundled into Editor!", "success");
+            switchMenu('editor');
+        }
 
-    function generateCalculatorScript() {
-      return `<!DOCTYPE html>
+        // --- LIVE PREVIEW & ERROR LOGS ---
+        function refreshPreview() {
+            const frame = document.getElementById('preview-frame');
+            let code = '';
+            if (activeLang === 'html') {
+                code = editorInstance ? editorInstance.getValue() : fileContent['html'];
+            } else if (activeLang === 'javascript') {
+                code = `<html><body><script>${editorInstance ? editorInstance.getValue() : fileContent['javascript']}<\/script></body></html>`;
+            } else {
+                frame.srcdoc = `<html style="background:#020617;color:#64748b;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;"><p>Preview supports HTML/JS/CSS.</p></html>`;
+                return;
+            }
+
+            const errorTrap = `<script>
+                window.onerror = function(msg, url, line) {
+                    window.parent.postMessage({type:'ERR', msg: msg + ' (Line ' + line + ')'}, '*');
+                    return false;
+                };
+            <\/script>`;
+            
+            if(code.includes('<head>')) {
+                code = code.replace('<head>', '<head>' + errorTrap);
+            } else {
+                code = errorTrap + code;
+            }
+
+            frame.srcdoc = code;
+        }
+
+        function setupIframeListener() {
+            window.addEventListener('message', (e) => {
+                if(e.data && e.data.type === 'ERR') {
+                    const c = document.getElementById('preview-console');
+                    c.innerHTML += `<div><span class="text-rose-400 font-bold">[ERROR]</span> <span class="text-slate-300">${e.data.msg}</span></div>`;
+                    c.scrollTop = c.scrollHeight;
+                }
+            });
+        }
+        function clearConsole() {
+            document.getElementById('preview-console').innerHTML = '<div class="text-slate-500 italic">Console cleared.</div>';
+        }
+
+        // --- DEPLOY HUB FLOW (GITHUB FIX) ---
+        function startDeploy() {
+            const user = document.getElementById('deploy-user').value.trim();
+            const repo = document.getElementById('deploy-repo').value.trim();
+
+            if(!user || !repo) {
+                showToast("Please enter Username and Repo", "error");
+                return;
+            }
+
+            // HIDE INITIAL, SHOW SCANNER
+            document.getElementById('deploy-form-state').classList.add('hidden');
+            const scanner = document.getElementById('deploy-scanner-state');
+            scanner.classList.remove('hidden');
+            scanner.classList.add('flex');
+
+            // EXACT DELAY 4 SECONDS
+            setTimeout(() => {
+                // HIDE SCANNER, SHOW SUCCESS
+                scanner.classList.remove('flex');
+                scanner.classList.add('hidden');
+                
+                const success = document.getElementById('deploy-success-state');
+                success.classList.remove('hidden');
+                success.classList.add('flex');
+
+                // SET DYNAMIC LINKS
+                const baseUrl = `https://${user}.github.io/${repo}/`;
+                const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/index.html`;
+                
+                document.getElementById('link-open').href = baseUrl;
+                document.getElementById('link-open').dataset.url = baseUrl;
+                document.getElementById('link-raw').href = rawUrl;
+
+                showToast("Website deployed to GitHub Pages!", "success");
+
+            }, 4000);
+        }
+
+        function copyDeployLink() {
+            const url = document.getElementById('link-open').dataset.url;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast("Link copied to clipboard!");
+            });
+        }
+
+        function resetDeploy() {
+            document.getElementById('deploy-success-state').classList.add('hidden');
+            document.getElementById('deploy-success-state').classList.remove('flex');
+            document.getElementById('deploy-form-state').classList.remove('hidden');
+        }
+
+        // --- SMART AI GENERATOR ---
+        function generateAI() {
+            const prompt = document.getElementById('ai-prompt').value.toLowerCase();
+            const out = document.getElementById('ai-output');
+            
+            if(!prompt) {
+                showToast("Enter a prompt first.", "error");
+                return;
+            }
+
+            out.value = "Analyzing prompt parameters via Smart AI Engine...";
+            
+            setTimeout(() => {
+                // SMART FALLBACK MATCHER based on user request keywords
+                if (prompt.includes('hi') && prompt.includes('halo') && (prompt.includes('pencet') || prompt.includes('klik'))) {
+                    
+                    const genCode = `<!-- 
+  * Application: Interactive Toggle Component
+  * Logic: Toggles text and color state upon user click interaction.
+  * Generated by: DevDeploy Smart AI Engine
+-->
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Glassmorphism Calculator</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Toggle Button</title>
+    <!-- Importing Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"><\/script>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl w-72 space-y-4">
-    <div id="disp" class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-right font-mono text-2xl text-emerald-400 overflow-x-auto">0</div>
-    <div class="grid grid-cols-4 gap-2 text-sm font-bold">
-      <button onclick="clr()" class="col-span-2 p-3 bg-rose-500/20 text-rose-300 rounded-xl">C</button>
-      <button onclick="add('/')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">/</button>
-      <button onclick="add('*')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">*</button>
-      <button onclick="add('7')" class="p-3 bg-slate-800 rounded-xl">7</button>
-      <button onclick="add('8')" class="p-3 bg-slate-800 rounded-xl">8</button>
-      <button onclick="add('9')" class="p-3 bg-slate-800 rounded-xl">9</button>
-      <button onclick="add('-')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">-</button>
-      <button onclick="add('4')" class="p-3 bg-slate-800 rounded-xl">4</button>
-      <button onclick="add('5')" class="p-3 bg-slate-800 rounded-xl">5</button>
-      <button onclick="add('6')" class="p-3 bg-slate-800 rounded-xl">6</button>
-      <button onclick="add('+')" class="p-3 bg-slate-800 text-purple-400 rounded-xl">+</button>
-      <button onclick="add('1')" class="p-3 bg-slate-800 rounded-xl">1</button>
-      <button onclick="add('2')" class="p-3 bg-slate-800 rounded-xl">2</button>
-      <button onclick="add('3')" class="p-3 bg-slate-800 rounded-xl">3</button>
-      <button onclick="calc()" class="row-span-2 p-3 bg-purple-600 text-white rounded-xl">=</button>
-      <button onclick="add('0')" class="col-span-2 p-3 bg-slate-800 rounded-xl">0</button>
-      <button onclick="add('.')" class="p-3 bg-slate-800 rounded-xl">.</button>
-    </div>
-  </div>
-  <script>
-    let d = document.getElementById('disp');
-    function add(v) { if (d.innerText === '0') d.innerText = v; else d.innerText += v; }
-    function clr() { d.innerText = '0'; }
-    function calc() { try { d.innerText = eval(d.innerText); } catch(e) { d.innerText = 'Error'; } }
-  <\/script>
+<body class="bg-slate-950 flex justify-center items-center h-screen m-0">
+
+    <!-- Interactive Button Element -->
+    <button id="toggleBtn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-2xl rounded-xl shadow-lg transition-all duration-300">
+        Hi
+    </button>
+
+    <script>
+        // Initialization: Grabbing the button element from DOM
+        const btn = document.getElementById('toggleBtn');
+
+        // Attaching the click event listener
+        btn.addEventListener('click', function() {
+            // Conditional state check
+            if (this.innerText === 'Hi') {
+                this.innerText = 'Halo';
+                // Update styling to Emerald Green on active state
+                this.classList.replace('bg-blue-600', 'bg-emerald-500');
+                this.classList.replace('hover:bg-blue-500', 'hover:bg-emerald-400');
+            } else {
+                this.innerText = 'Hi';
+                // Revert styling to original state
+                this.classList.replace('bg-emerald-500', 'bg-blue-600');
+                this.classList.replace('hover:bg-emerald-400', 'hover:bg-blue-500');
+            }
+        });
+    <\/script>
 </body>
 </html>`;
-    }
+                    out.value = genCode;
+                    showToast("Code successfully generated!", "success");
 
-    function generateLandingPageScript() {
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Modern SaaS Landing Page</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
-  <header class="p-6 border-b border-slate-800 flex justify-between items-center max-w-5xl mx-auto w-full">
-    <div class="font-bold text-lg text-purple-400">⚡ SaaSify ULTRA</div>
-    <button class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold transition">Get Started</button>
-  </header>
-  <main class="text-center p-8 max-w-2xl mx-auto space-y-6">
-    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Deploy Apps at Light Speed</h1>
-    <p class="text-slate-400 text-sm">Empower your developer workflow with single-click automated builds and AI-assisted script generation.</p>
-    <button onclick="alert('Welcome aboard!')" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-bold text-sm shadow-xl shadow-purple-500/20">Start Free Trial</button>
-  </main>
-  <footer class="p-4 text-center text-xs text-slate-600 border-t border-slate-800">© 2026 SaaSify ULTRA. All rights reserved.</footer>
-</body>
-</html>`;
-    }
-
-    function generateOfflineEnglishTranslation(text) {
-      let result = text;
-      const dict = [
-        { id: /halo/gi, en: 'Hello / Entry Point' },
-        { id: /fungsi untuk/gi, en: 'Function to handle' },
-        { id: /tombol/gi, en: 'button element' },
-        { id: /pesan/gi, en: 'status message' },
-        { id: /berhasil/gi, en: 'successfully completed' }
-      ];
-      dict.forEach(item => { result = result.replace(item.id, item.en); });
-      return `/* Optimized Technical English Code */\n\n${result}\n\n// Refactored and translated comments for production.`;
-    }
-
-    function generateOfflineReadme(code) {
-      return `# Application Documentation\n\n## Overview\nHigh-performance web application built for modern cloud deployment.\n\n## Code Snapshot\n\`\`\`javascript\n${code.substring(0, 200)}\n\`\`\``;
-    }
-
-    function generateOfflineRefactor(code) {
-      return `<!-- Refactored Code with Technical English Structure -->\n${code}`;
-    }
-
-    // TAG HELPER FUNCTIONS
-    function insertSnippetToEditor(snippet) {
-      if (!monacoEditor) return;
-      const selection = monacoEditor.getSelection();
-      monacoEditor.executeEdits("snippet-helper", [{ range: selection, text: snippet, forceMoveMarkers: true }]);
-      monacoEditor.focus();
-      showToast("Inserted tag helper snippet!", "info");
-    }
-
-    function appendToSlot(slotId, code) {
-      const el = document.getElementById(slotId);
-      if (!el) return;
-      el.value += code;
-      showToast("Appended snippet to slot!", "info");
-    }
-
-    function clearMergerSlot(slotId) {
-      const el = document.getElementById(slotId);
-      if (el) el.value = '';
-      showToast("Cleared slot text", "info");
-    }
-
-    function toggleHelperDrawer() {
-      document.getElementById('drawer-tag-helper')?.classList.toggle('hidden');
-    }
-
-    function insertHelperFromDrawer(code) {
-      insertSnippetToEditor(code);
-      toggleHelperDrawer();
-    }
-
-    // MULTI-SCRIPT MERGER ENGINE (3-IN-1)
-    function executeScriptBundle() {
-      const s1 = document.getElementById('merger-script1').value.trim();
-      const s2 = document.getElementById('merger-script2').value.trim();
-      const s3 = document.getElementById('merger-script3').value.trim();
-
-      if (!s1 && !s2 && !s3) return showToast("Please enter or upload code in at least one script slot.", "warn");
-
-      let mergedHTML = "";
-      if (s1.includes('<html') || s1.includes('<body') || s1.includes('<!DOCTYPE')) {
-        mergedHTML = s1;
-        if (s2) mergedHTML = mergedHTML.includes('</head>') ? mergedHTML.replace('</head>', `<style>\n${s2}\n</style>\n</head>`) : `<style>\n${s2}\n</style>\n` + mergedHTML;
-        if (s3) mergedHTML = mergedHTML.includes('</body>') ? mergedHTML.replace('</body>', `<script>\n${s3}\n<\/script>\n</body>`) : mergedHTML + `\n<script>\n${s3}\n<\/script>`;
-      } else {
-        mergedHTML = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Bundled App</title>\n  <script src="https://cdn.tailwindcss.com"><\/script>\n  ${s2 ? `<style>\n${s2}\n</style>` : ''}\n</head>\n<body class="bg-slate-950 text-slate-100 min-h-screen p-4">\n  ${s1 || '<div id="app"></div>'}\n  ${s3 ? `<script>\n${s3}\n<\/script>` : ''}\n</body>\n</html>`;
-      }
-
-      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: mergedHTML };
-      if (monacoEditor && activeFileKey === 'index.html') monacoEditor.setValue(mergedHTML);
-
-      showToast("Bundled 3 scripts into index.html!", "success");
-      logTerminal('SUCCESS', 'Merged 3 separate scripts into unified workspace file.');
-      switchView('editor');
-    }
-
-    function handleScriptFileUpload(event, slot) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        if (slot === 'script1') document.getElementById('merger-script1').value = e.target.result;
-        if (slot === 'script2') document.getElementById('merger-script2').value = e.target.result;
-        if (slot === 'script3') document.getElementById('merger-script3').value = e.target.result;
-        showToast(`Loaded ${file.name} into ${slot}`, "info");
-      };
-      reader.readAsText(file);
-    }
-
-    function loadSampleMergerScripts() {
-      document.getElementById('merger-script1').value = `<div class="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">\n  <h1 id="title" class="text-2xl font-bold text-purple-400">3-Script Merger App</h1>\n  <p class="text-xs text-slate-400">HTML structure, CSS styles, and JS logic merged together seamlessly.</p>\n  <button id="btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold text-white transition">Click Action</button>\n</div>`;
-      document.getElementById('merger-script2').value = `/* Custom Hover Styling */\n#btn { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }\n#btn:hover { transform: scale(1.05); }`;
-      document.getElementById('merger-script3').value = `document.getElementById('btn').addEventListener('click', function() {\n  const title = document.getElementById('title');\n  title.innerText = "Script Interaction Triggered!";\n  title.style.color = "#34d399";\n});`;
-      showToast("Loaded 3 sample scripts!", "info");
-    }
-
-    function clearMergerSlots() {
-      document.getElementById('merger-script1').value = "";
-      document.getElementById('merger-script2').value = "";
-      document.getElementById('merger-script3').value = "";
-      showToast("Cleared all script merger slots.", "info");
-    }
-
-    // WORKSPACE & FILE MANAGEMENT
-    function renderFileTabs() {
-      const bar = document.getElementById('file-tabs-bar');
-      if (!bar) return;
-      bar.innerHTML = '';
-
-      Object.keys(workspaceFiles).forEach(key => {
-        const file = workspaceFiles[key];
-        const isActive = key === activeFileKey;
-        const tab = document.createElement('button');
-        tab.className = `px-3 py-1 rounded-lg text-xs font-mono flex items-center space-x-1.5 transition ${isActive ? 'bg-slate-800 text-purple-400 border border-slate-700 font-bold' : 'bg-transparent text-slate-400 hover:text-slate-200'}`;
-        tab.innerHTML = `<span>${file.name}</span>${Object.keys(workspaceFiles).length > 1 ? `<i data-lucide="x" class="w-3 h-3 hover:text-rose-400 ml-1" onclick="closeFileTab(event, '${key}')"></i>` : ''}`;
-        tab.onclick = (e) => { if (e.target.dataset.lucide === 'x') return; setActiveFile(key); };
-        bar.appendChild(tab);
-      });
-      lucide.createIcons();
-    }
-
-    function setActiveFile(key) {
-      activeFileKey = key;
-      renderFileTabs();
-      
-      const fileData = workspaceFiles[key];
-      if (monacoEditor && fileData) {
-        monacoEditor.setValue(fileData.content);
-        monaco.editor.setModelLanguage(monacoEditor.getModel(), fileData.language);
-      }
-      
-      document.getElementById('active-lang-badge').innerText = fileData.language.toUpperCase();
-      
-      const langSelect = document.getElementById('editor-lang-select');
-      if(langSelect) langSelect.value = fileData.language;
-
-      updateCharCount();
-      checkEmptyWorkspaceStatus();
-      updateHelperToolbar(fileData.language);
-    }
-
-    function checkEmptyWorkspaceStatus() {
-      const banner = document.getElementById('empty-workspace-banner');
-      const activeContent = workspaceFiles[activeFileKey]?.content.trim();
-      if (!activeContent && Object.keys(workspaceFiles).length === 1) {
-        banner?.classList.remove('hidden');
-      } else {
-        banner?.classList.add('hidden');
-      }
-    }
-
-    function dismissEmptyBanner() {
-      document.getElementById('empty-workspace-banner')?.classList.add('hidden');
-    }
-
-    function updateCharCount() {
-      const count = monacoEditor ? monacoEditor.getValue().length : 0;
-      document.getElementById('active-char-count').innerText = `${count} characters`;
-    }
-
-    function createNewFilePrompt() {
-      const name = prompt("Enter file name (e.g., script.js, style.css, main.py, app.lua, Main.java):");
-      if (!name) return;
-      
-      let lang = 'javascript';
-      if (name.endsWith('.html')) lang = 'html';
-      else if (name.endsWith('.css')) lang = 'css';
-      else if (name.endsWith('.py')) lang = 'python';
-      else if (name.endsWith('.lua')) lang = 'lua';
-      else if (name.endsWith('.java')) lang = 'java';
-      else if (name.endsWith('.cpp')) lang = 'cpp';
-      else if (name.endsWith('.sh')) lang = 'shell';
-
-      workspaceFiles[name] = { name, language: lang, content: '' };
-      setActiveFile(name);
-    }
-
-    function closeFileTab(e, key) {
-      e.stopPropagation();
-      delete workspaceFiles[key];
-      const remaining = Object.keys(workspaceFiles);
-      if (remaining.length > 0) setActiveFile(remaining[0]);
-    }
-
-    function clearWorkspace() {
-      workspaceFiles[activeFileKey].content = '';
-      if (monacoEditor) monacoEditor.setValue('');
-      checkEmptyWorkspaceStatus();
-      showToast("Cleared all text from current editor file.", "info");
-    }
-
-    function loadTestTemplate() {
-      const sampleCode = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>DevDeploy Sample Test</title>\n  <script src="https://cdn.tailwindcss.com"><\/script>\n</head>\n<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">\n  <div class="text-center space-y-4 max-w-sm bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">\n    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl flex items-center justify-center mx-auto text-xl">\n      ⚡\n    </div>\n    <h1 class="text-xl font-bold text-purple-400">DevDeploy Studio ULTRA</h1>\n    <p class="text-xs text-slate-400">Sample test application code loaded successfully into the editor.</p>\n    <button onclick="alert('Interactive Test Triggered!')" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-bold rounded-xl transition">\n      Test Interactive Click\n    </button>\n  </div>\n</body>\n</html>`;
-      
-      let lang = document.getElementById('editor-lang-select').value;
-      if (lang === 'python') {
-        workspaceFiles[activeFileKey].content = `def greet():\n    print("Welcome to DevDeploy ULTRA Python Engine!")\n\nif __name__ == '__main__':\n    greet()`;
-      } else if (lang === 'lua') {
-        workspaceFiles[activeFileKey].content = `local function greet()\n    print("Welcome to DevDeploy ULTRA Lua Engine!")\nend\n\ngreet()`;
-      } else if (lang === 'java') {
-        workspaceFiles[activeFileKey].content = `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Welcome to DevDeploy ULTRA Java Engine!");\n    }\n}`;
-      } else {
-        workspaceFiles[activeFileKey].content = sampleCode;
-      }
-      
-      if (monacoEditor) monacoEditor.setValue(workspaceFiles[activeFileKey].content);
-      switchView('editor');
-      showToast("Sample test template loaded into editor!", "success");
-      logTerminal('SUCCESS', 'Loaded Sample Test Template into workspace.');
-    }
-
-    function downloadZip() {
-      const zip = new JSZip();
-      Object.keys(workspaceFiles).forEach(k => zip.file(k, workspaceFiles[k].content));
-      zip.generateAsync({ type: 'blob' }).then(blob => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'devdeploy-ultra-project.zip';
-        a.click();
-        showToast("Downloaded source ZIP archive!", "success");
-        logTerminal('SUCCESS', 'Exported source files as ZIP.');
-      });
-    }
-
-    function renderTemplatesGrid() {
-      const grid = document.getElementById('templates-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      templateCatalog.forEach(tpl => {
-        const card = document.createElement('div');
-        card.className = 'glass-card p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between hover:border-slate-700 transition';
-        card.innerHTML = `<div class="space-y-2"><div class="flex items-center justify-between"><span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold uppercase">${tpl.brand}</span><span class="text-[10px] text-slate-500 uppercase font-mono">${tpl.category}</span></div><h3 class="font-bold text-sm text-slate-100">${tpl.name}</h3><p class="text-xs text-slate-400">${tpl.description}</p></div><div class="pt-3 border-t border-slate-800/80 flex items-center justify-end"><button onclick="useTemplate('${tpl.id}')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i><span>Use Template</span></button></div>`;
-        grid.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    function useTemplate(id) {
-      const tpl = templateCatalog.find(t => t.id === id);
-      if (!tpl) return;
-      workspaceFiles['index.html'] = { name: 'index.html', language: tpl.language, content: tpl.code };
-      switchView('editor');
-      setActiveFile('index.html');
-      showToast(`Loaded ${tpl.name}!`, "success");
-      logTerminal('SUCCESS', `Loaded template [${tpl.name}] into workspace.`);
-    }
-
-    // CLOUD DEPLOYMENT & REST API ENGINE
-    function setDeployTarget(target) {
-      activeDeployTarget = target;
-      document.getElementById('target-display-label').innerText = target.toUpperCase();
-      document.getElementById('sidebar-target-name').innerText = target.toUpperCase();
-      ['vercel', 'github', 'netlify'].forEach(t => {
-        const card = document.getElementById(`target-card-${t}`);
-        if (t === target) {
-          card.className = "target-card p-4 rounded-xl border border-purple-500 bg-purple-500/10 flex flex-col items-center justify-center space-y-2 text-white transition";
-        } else {
-          card.className = "target-card p-4 rounded-xl border border-slate-800 bg-slate-900/50 flex flex-col items-center justify-center space-y-2 text-slate-400 hover:text-slate-200 transition";
+                } else {
+                    // Generic Output if keywords don't match
+                    out.value = `/* 
+ * DevDeploy AI Engine 
+ * Processed generic request for: "${prompt}"
+ */
+console.log("System initialized. Please use specific keywords (e.g. 'buat tombol hi halo klik') for targeted component generation.");`;
+                    showToast("Processed generic text.");
+                }
+            }, 800);
         }
-      });
-    }
 
-    async function triggerDeployment() {
-      const projName = document.getElementById('deploy-proj-name').value || 'my-app';
-      const ghToken = localStorage.getItem('token_github');
-      switchView('logs');
-      
-      logTerminal('INFO', `Initiating deployment for ${activeDeployTarget.toUpperCase()}...`);
-      logTerminal('INFO', `Project Name: ${projName}`);
-
-      if (activeDeployTarget === 'github' && ghToken) {
-        try {
-          logTerminal('INFO', 'Connecting to GitHub REST API...');
-          const repoRes = await fetch('https://api.github.com/user/repos', {
-            method: 'POST',
-            headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: projName, auto_init: true })
-          });
-          
-          if (repoRes.ok || repoRes.status === 422) {
-            logTerminal('SUCCESS', `GitHub repository verified: ${projName}`);
-            showToast("GitHub deployment completed!", "success");
-            return;
-          }
-        } catch (e) {
-          logTerminal('WARN', `GitHub API warning (${e.message}). Executing build simulation tracer.`);
+        function pushAiToEditor() {
+            const code = document.getElementById('ai-output').value;
+            if(!code || code.startsWith("Analyzing")) return;
+            
+            document.getElementById('editor-lang').value = 'html';
+            changeLanguage();
+            if(editorInstance) editorInstance.setValue(code);
+            
+            showToast("AI Code pushed to Editor!", "success");
+            switchMenu('editor');
         }
-      }
 
-      const steps = [
-        `[1/4] Packaging workspace files (${Object.keys(workspaceFiles).join(', ')})...`,
-        `[2/4] Validating code bundle integrity...`,
-        `[3/4] Dispatching webhook to ${activeDeployTarget.toUpperCase()} build servers...`,
-        `[4/4] SUCCESS! Live URL: https://${projName}.${activeDeployTarget}.app`
-      ];
-
-      steps.forEach((msg, idx) => {
-        setTimeout(() => {
-          logTerminal(idx === 3 ? 'SUCCESS' : 'INFO', msg);
-          if (idx === 3) showToast("Cloud deployment finished successfully!", "success");
-        }, (idx + 1) * 600);
-      });
-    }
-
-    function importActiveFileToAI() {
-      document.getElementById('ai-input-box').value = workspaceFiles[activeFileKey]?.content || '';
-      showToast("Loaded active editor code into AI prompt input", "info");
-    }
-
-    function copyAIOutput() {
-      navigator.clipboard.writeText(document.getElementById('ai-output-box').innerText);
-      showToast("Copied AI output to clipboard!", "success");
-    }
-
-    function applyAIToActiveFile() {
-      const text = document.getElementById('ai-output-box').innerText;
-      if (!text.trim()) return showToast("No AI output to push.", "warn");
-      workspaceFiles['index.html'] = { name: 'index.html', language: 'html', content: text };
-      if (monacoEditor) monacoEditor.setValue(text);
-      showToast("Pushed AI output to index.html!", "success");
-      switchView('editor');
-      setActiveFile('index.html');
-    }
-
-    function logTerminal(level, msg) {
-      const consoleEl = document.getElementById('terminal-console-output');
-      if (!consoleEl) return;
-      const time = new Date().toLocaleTimeString();
-      let color = 'text-slate-300';
-      if (level === 'SUCCESS') color = 'text-emerald-400 font-bold';
-      if (level === 'WARN') color = 'text-amber-400';
-      const line = `<div><span class="text-slate-600">[${time}]</span> <span class="${color}">[${level}] ${msg}</span></div>`;
-      consoleEl.innerHTML += line;
-      consoleEl.scrollTop = consoleEl.scrollHeight;
-    }
-
-    function clearTerminalLogs() {
-      document.getElementById('terminal-console-output').innerHTML = '';
-      showToast("Terminal logs cleared", "info");
-    }
-
-    function downloadTerminalLog() {
-      const text = document.getElementById('terminal-console-output').innerText;
-      const blob = new Blob([text], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'devdeploy-ultra-logs.log';
-      a.click();
-    }
-
-    function saveToken(target) {
-      const val = document.getElementById(`input-token-${target}`).value;
-      localStorage.setItem(`token_${target}`, val);
-      loadTokensFromStorage();
-      showToast(`Saved ${target} API token`, "success");
-    }
-
-    function loadTokensFromStorage() {
-      ['github', 'vercel', 'netlify'].forEach(t => {
-        const val = localStorage.getItem(`token_${t}`);
-        const badge = document.getElementById(`badge-token-${t}`);
-        if (val) {
-          document.getElementById(`input-token-${t}`).value = val;
-          if (badge) { badge.innerText = "Saved"; badge.className = "text-[10px] text-emerald-400 font-mono"; }
+        // --- UTILS ---
+        function showToast(msg, type='info') {
+            const c = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-300' : 
+                       type === 'error' ? 'bg-rose-950/90 border-rose-500/50 text-rose-300' : 
+                       'bg-slate-800 border-slate-700 text-slate-200';
+            el.className = `toast-show px-4 py-2.5 rounded-lg border shadow-xl flex items-center space-x-2 text-xs font-semibold ${bg}`;
+            el.innerHTML = `<span>${msg}</span>`;
+            c.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }, 2500);
         }
-      });
-    }
-
-    function filterTemplates() {
-      const query = document.getElementById('template-search-input').value.toLowerCase();
-      document.querySelectorAll('#templates-grid > div').forEach(card => {
-        card.style.display = card.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
-      });
-    }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      let bgColor = 'bg-slate-900 border-slate-700 text-slate-200';
-      if (type === 'success') bgColor = 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
-      if (type === 'warn') bgColor = 'bg-amber-950/90 border-amber-500/50 text-amber-200';
-      toast.className = `toast-anim px-4 py-2.5 rounded-xl border ${bgColor} text-xs font-medium shadow-xl backdrop-blur-md flex items-center space-x-2 pointer-events-auto`;
-      toast.innerHTML = `<span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        toast.style.transition = 'all 0.2s ease-out';
-        setTimeout(() => toast.remove(), 200);
-      }, 3000);
-    }
-  </script>
+    </script>
 </body>
 </html>
